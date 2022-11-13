@@ -1,0 +1,10 @@
+<!--
+  This file will launch rViz for visualization of point cloud data collected by four mmWave radar sensors. 
+  This file is intended to be used for visualization on a remote PC while the radar driver runs on TDA4 device.
+ -->
+
+<launch>
+
+  <node pkg="rviz" type="rviz" name="rviz" args="-d $(find ti_mmwave_rospkg)/launch/rviz/ti_mmwave_quad.rviz"/>
+
+</launch>
