@@ -8,7 +8,7 @@
   <!-- Example:  -->
   <!-- <maintainer email="jane.doe@example.com">Jane Doe</maintainer> -->
   <maintainer email="dr.leo.zhang@outlook.com">Leo Zhang</maintainer>
-  <maintainer email="a-wendell@ti.com">Allison Wendell</maintainer>
+
 
   <!-- One license tag required, multiple allowed, one license per tag -->
   <!-- Commonly used license strings: -->
@@ -19,14 +19,13 @@
   <!-- Url tags are optional, but multiple are allowed, one per tag -->
   <!-- Optional attribute type can be: website, bugtracker, or repository -->
   <!-- Example: -->
-  <url type="website">https://github.com/radar-lab/ti_mmwave_rospkg</url>
-  <url type="website">https://bitbucket.itg.ti.com/scm/mmwave_apps/ros_multisensor_demo/ti_mmwave_rospkg</url>
+  <url type="website">https://github.com/radar-lab/ti_mmwave_rospkg</url> -->
+
 
   <!-- Author tags are optional, multiple are allowed, one per tag -->
   <!-- Authors do not have to be maintainers, but could be -->
   <!-- Example: -->
   <author email="dr.leo.zhang@outlook.com">Leo Zhang</author>
-  <author email="a-wendell@ti.com">Allison Wendell</author>
 
 
   <!-- The *_depend tags are used to specify dependencies -->

@@ -1,46 +1,42 @@
+/*
+* @file DataHandlerClass.cpp
+*
+* @brief
+* Handles and publishes incoming data from the sensor and .
+*
+* \par
+* NOTE:
+* (C) Copyright 2020 Texas Instruments, Inc.
+*
+* Redistribution and use in source and binary forms, with or without
+* modification, are permitted provided that the following conditions
+* are met:
+*
+* Redistributions of source code must retain the above copyright
+* notice, this list of conditions and the following disclaimer.
+*
+* Redistributions in binary form must reproduce the above copyright
+* notice, this list of conditions and the following disclaimer in the
+* documentation and/or other materials provided with the
+* distribution.
+*
+* Neither the name of Texas Instruments Incorporated nor the names of
+* its contributors may be used to endorse or promote products derived
+* from this software without specific prior written permission.
+*
+* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+* "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+* LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+* A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+* OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+* SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+* LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+* DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+* THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+* (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+* OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
 #include <DataHandlerClass.h>
-#define PCL_NO_PRECOMPILE
-
-//#include <pcl/memory.h>
-#include <pcl/pcl_macros.h>
-#include <pcl/point_types.h>
-#include <pcl/point_cloud.h>
-#include <pcl/io/pcd_io.h>
-
-DataUARTHandler* gDataHandlerPtr;
-
-void DataUARTHandler::sigHandler(int32_t sig)
-{
-    switch(sig)
-    {
-    case SIGINT:
-        gDataHandlerPtr->stop();
-
-    }
-    
-}
-
-struct mmWaveCloudType
-{
-    PCL_ADD_POINT4D;
-    union
-    {
-        struct
-        {
-            float intensity;
-            float velocity;
-        };
-        float data_c[4];
-    };
-    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-} EIGN_ALIGN16;
-
-POINT_CLOUD_REGISTER_POINT_STRUCT (mmWaveCloudType,
-                                    (float, x, x)
-                                    (float, y, y)
-                                    (float, z, z)
-                                    (float, intensity, intensity)
-                                    (float, velocity, velocity))
 
 DataUARTHandler::DataUARTHandler(ros::NodeHandle* nh) : currentBufp(&pingPongBuffers[0]) , nextBufp(&pingPongBuffers[1]) {
     DataUARTHandler_pub = nh->advertise<sensor_msgs::PointCloud2>("/ti_mmwave/radar_scan_pcl", 100);
@@ -67,10 +63,6 @@ DataUARTHandler::DataUARTHandler(ros::NodeHandle* nh) : currentBufp(&pingPongBuf
 
     ROS_INFO("\n\n==============================\nList of parameters\n==============================\nNumber of range samples: %d\nNumber of chirps: %d\nf_s: %.3f MHz\nf_c: %.3f GHz\nBandwidth: %.3f MHz\nPRI: %.3f us\nFrame time: %.3f ms\nMax range: %.3f m\nRange resolution: %.3f m\nMax Doppler: +-%.3f m/s\nDoppler resolution: %.3f m/s\n==============================\n", \
         nr, nd, fs/1e6, fc/1e9, BW/1e6, PRI*1e6, tfr*1e3, max_range, vrange, max_vel/2, vvel);
-
-    gDataHandlerPtr = this;
-
-    stop_threads = false;
 }
 
 void DataUARTHandler::setFrameID(char* myFrameID)
@@ -245,16 +237,8 @@ void *DataUARTHandler::syncedBufferSwap(void)
     
         while(countSync < COUNT_SYNC_MAX)
         {
-            if(stop_threads)
-            {
-                pthread_mutex_unlock(&countSync_mutex);
-                pthread_cond_signal(&sort_go_cv);
-                pthread_cond_signal(&read_go_cv);
-                pthread_exit(NULL);
-            }
-
             pthread_cond_wait(&countSync_max_cv, &countSync_mutex);
-
+            
             pthread_mutex_lock(&currentBufp_mutex);
             pthread_mutex_lock(&nextBufp_mutex);
             
@@ -294,8 +278,7 @@ void *DataUARTHandler::sortIncomingData( void )
     float maxElevationAngleRatioSquared;
     float maxAzimuthAngleRatio;
     
-    //boost::shared_ptr<pcl::PointCloud<pcl::PointXYZI>> RScan(new pcl::PointCloud<pcl::PointXYZI>);
-    boost::shared_ptr<pcl::PointCloud<mmWaveCloudType>> RScan(new pcl::PointCloud<mmWaveCloudType>);
+    boost::shared_ptr<pcl::PointCloud<pcl::PointXYZI>> RScan(new pcl::PointCloud<pcl::PointXYZI>);
     ti_mmwave_rospkg::RadarScan radarscan;
 
     //wait for first packet to arrive
@@ -307,7 +290,7 @@ void *DataUARTHandler::sortIncomingData( void )
     
     while(ros::ok())
     {
-
+        
         switch(sorterState)
         {
             
@@ -406,7 +389,6 @@ void *DataUARTHandler::sortIncomingData( void )
             // RScan->header.seq = 0;
             // RScan->header.stamp = (uint64_t)(ros::Time::now());
             // RScan->header.stamp = (uint32_t) mmwData.header.timeCpuCycles;
-            pcl_conversions::toPCL(ros::Time::now(), RScan->header.stamp);
             RScan->header.frame_id = frameID;
             RScan->height = 1;
             RScan->width = mmwData.numObjOut;
@@ -511,8 +493,6 @@ void *DataUARTHandler::sortIncomingData( void )
                     RScan->points[i].x = mmwData.newObjOut.y;   // ROS standard coordinate system X-axis is forward which is the mmWave sensor Y-axis
                     RScan->points[i].y = -mmwData.newObjOut.x;  // ROS standard coordinate system Y-axis is left which is the mmWave sensor -(X-axis)
                     RScan->points[i].z = mmwData.newObjOut.z;   // ROS standard coordinate system Z-axis is up which is the same as mmWave sensor Z-axis
-
-                    RScan->points[i].velocity = mmwData.newObjOut.velocity;
 
                     radarscan.header.frame_id = frameID;
                     radarscan.header.stamp = ros::Time::now();
@@ -697,8 +677,9 @@ void *DataUARTHandler::sortIncomingData( void )
                     
                     //ROS_INFO("mmwData.numObjOut after = %d", mmwData.numObjOut);
                     //ROS_INFO("DataUARTHandler Sort Thread: number of obj = %d", mmwData.numObjOut );
+                    
+                    DataUARTHandler_pub.publish(RScan);
                 }
-                DataUARTHandler_pub.publish(RScan);
 
                 //ROS_INFO("DataUARTHandler Sort Thread : CHECK_TLV_TYPE state says tlvCount max was reached, going to switch buffer state");
                 sorterState = SWAP_BUFFERS;
@@ -807,18 +788,10 @@ void *DataUARTHandler::sortIncomingData( void )
 
 void DataUARTHandler::start(void)
 {
-
+    
     pthread_t uartThread, sorterThread, swapThread;
-
+    
     int  iret1, iret2, iret3;
-
-    sigset_t set;
-    int s;
-
-    /* Block SIGINT on main thread and subsequently created threads */
-    sigemptyset(&set);
-    sigaddset(&set, SIGINT);
-    s = pthread_sigmask(SIG_BLOCK, &set, NULL);
     
     pthread_mutex_init(&countSync_mutex, NULL);
     pthread_mutex_init(&nextBufp_mutex, NULL);
@@ -850,29 +823,24 @@ void DataUARTHandler::start(void)
         ROS_INFO("Error - pthread_create() return code: %d\n",iret1);
         ros::shutdown();
     }
-
-    /* Unlock SIGINT on main thread */
-    s = pthread_sigmask(SIG_UNBLOCK, &set, NULL);
-
-    signal(SIGINT, sigHandler);
     
     ros::spin();
 
-    pthread_join(uartThread, NULL);
+    pthread_join(iret1, NULL);
     ROS_INFO("DataUARTHandler Read Thread joined");
-
-    pthread_join(sorterThread, NULL);
+    pthread_join(iret2, NULL);
     ROS_INFO("DataUARTHandler Sort Thread joined");
-
-    pthread_join(swapThread, NULL);
+    pthread_join(iret3, NULL);
     ROS_INFO("DataUARTHandler Swap Thread joined");
-
+    
     pthread_mutex_destroy(&countSync_mutex);
     pthread_mutex_destroy(&nextBufp_mutex);
     pthread_mutex_destroy(&currentBufp_mutex);
     pthread_cond_destroy(&countSync_max_cv);
     pthread_cond_destroy(&read_go_cv);
     pthread_cond_destroy(&sort_go_cv);
+    
+    
 }
 
 void* DataUARTHandler::readIncomingData_helper(void *context)
@@ -919,16 +887,4 @@ void DataUARTHandler::visualize(const ti_mmwave_rospkg::RadarScan &msg){
     marker.color.b = 1;
 
     marker_pub.publish(marker);
-}
-
-void DataUARTHandler::stop()
-{
-    ROS_DEBUG("Stopping Threads");
-
-    stop_threads = true;
-    ros::shutdown();
-    
-    pthread_cond_signal(&read_go_cv);
-    pthread_cond_signal(&sort_go_cv);
-    pthread_cond_signal(&countSync_max_cv);
 }

@@ -19,7 +19,6 @@
 #include <pcl/point_types.h>
 #include <visualization_msgs/Marker.h>
 #include <cmath>
-#include <signal.h>
 #define COUNT_SYNC_MAX 2
 
 class DataUARTHandler{
@@ -49,19 +48,13 @@ public:
     /*User callable function to start the handler's internal threads*/
     void start(void);
     
-    /*User callable function to stop the handler's internal threads*/
-    void stop();
-
     /*Helper functions to allow pthread compatability*/
     static void* readIncomingData_helper(void *context);
     
     static void* sortIncomingData_helper(void *context);
     
     static void* syncedBufferSwap_helper(void *context);
-
-    /* Function to handle signals such as SIGINT */
-    static void sigHandler(int32_t sig);
-
+    
     /*Sorted mmwDemo Data structure*/
     mmwDataPacket mmwData;
 
@@ -97,9 +90,6 @@ private:
     
     /*Mutex protected variable which synchronizes threads*/
     int countSync;
-
-    /*Boolean used to notify threads to exit*/
-    bool stop_threads;
     
     /*Read/Write Buffers*/
     std::vector<uint8_t> pingPongBuffers[2];

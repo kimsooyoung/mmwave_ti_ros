@@ -1,13 +1,13 @@
 # TI mmWave ROS Package (Customized)
 
-#### Based on updates from Dr. Leo Zhang (University of Arizona)
+#### Auhor and Maintainer: Leo Zhang
+#### Organization: University of Arizona
+#### Email: dr.leo.zhang@outlook.com
 ---
-### Most recent change from Dr. Zhang:
+### Most recent change:
+
 Add support for XWR18XX devices. SDK version: 3.2.0.4.
 
-### Most recent change from Allison Wendell:
-Add support for XWR68XX devices. SDK version: 3.2.0.4
-  
 ---
 Initially derived from TI's origin ROS package in Industrial Toolbox 2.3.0 (new version available [Industrial Toolbox 2.5.2](http://dev.ti.com/tirex/#/?link=Software%2FmmWave%20Sensors%2FIndustrial%20Toolbox)).
 
@@ -20,26 +20,30 @@ Initially derived from TI's origin ROS package in Industrial Toolbox 2.3.0 (new 
 ---
 ### Available devices:
 ```
-TI mmWave xWR1443BOOST
-TI mmWave xWR1642BOOST
-TI mmWave xWR1642BOOST ES2.0/3.0 EVM (not tested)
-TI mmWave xWR1642BOOST ES2.0 EVM
+TI mmWave AWR1443BOOST
+TI mmWave AWR1642BOOST
+TI mmWave AWR1642BOOST ES2.0/3.0 EVM (not tested)
+TI mmWave AWR1642BOOST ES2.0 EVM
 TI mmWave AWR1843BOOST ES1.0 EVM
-TI mmWave IWR6843ISK ES1.0 EVM
 ```
 ---
 ### Quick start guide (AWR1642BOOST ES2.0 EVM):
 1. Mount AWR1642BOOST ES2.0 EVM (as below), connect 5V/2.5A power supply and connect a micro-USB cable to host Ubuntu 16.04 LTS with [ROS Kinetic](http://wiki.ros.org/kinetic).
+   
+![](https://github.com/radar-lab/ti_mmwave_rospkg/raw/master/auxiliary/mounting.jpg "AWR1642 Mounting")
 
 Note: Tested with Ubuntu 16.04 LTS with ROS Kinectic and Ubuntu 18.04 LTS with [ROS Melodic](http://wiki.ros.org/melodic)
 
 2. Download SDK 2.0 or above (suggested SDK 2.1) from [here](http://www.ti.com/tool/MMWAVE-SDK) and use [UNIFLASH](http://www.ti.com/tool/UNIFLASH) to flash xwr16xx_mmw_demo.bin to your device. **Do not forget SOP2 jumper when flashing.**
 
+Note:
+AWR1642 ES1.0 (usually purchased before May 2018) uses SDK 1.2. AWR1642 ES2.0 (usually purchased after May 2018) uses SDK 2.0. Same applies to AWR1443. (You can refer to [this thread](https://e2e.ti.com/support/sensors/f/1023/t/692195?tisearch=e2e-sitesearch&keymatch=%20user:356347))
+
 3. Clone this repo and ROS serial onto your `<workspace dir>/src`:
 
 ```
+git clone https://github.com/radar-lab/ti_mmwave_rospkg.git
 git clone https://github.com/wjwwood/serial.git
-git clone https://bitbucket.itg.ti.com/scm/mmwave_apps/ros_multisensor_demo.git
 ```
 4. Go back to `<workspace dir>`:
 
@@ -72,6 +76,8 @@ rostopic echo /ti_mmwave/radar_scan
 rosparam list
 rosparam get /ti_mmwave/max_doppler_vel
 ```
+
+Note: AWR1843 requires SDK 3.2.0.4, which has different output format. The later release will improve this part.
 
 ---
 ### Message format:
@@ -121,7 +127,7 @@ When this happens, re-run the command you send to sensor. If it continues, shut 
 ```
 roslaunch ti_mmwave_rospkg multi_1642_0.launch 
 ```
-3. Change radars' location in first six arguments `<node pkg="tf" type="static_transform_publisher" name="radar_baselink_0" args="0 0 0 0 0 0 ti_mmwave_pcl ti_mmwave_0 100"/>` (stands for x,y,z for positions in meters and yaw, pitch, roll for angles in radians) in launch file `multi_1642_1.launch`. And launch second device:
+3. Change radars' location in first three arguments `<node pkg="tf" type="static_transform_publisher" name="radar_baselink_0" args="0 -1 0 0 0 0 ti_mmwave_pcl ti_mmwave_0 100"/>` (stands for x,y,z for positions) in launch file `multi_1642_1.launch`. And launch second device:
 
 ```
 roslaunch ti_mmwave_rospkg multi_1642_1.launch 
@@ -141,4 +147,37 @@ rosrun rqt_image_view rqt_image_view
 4. Launch radar-camera system using:
 ```
 roslaunch ti_mmwave_rospkg camera_overlay.launch
+```
+
+---
+### Changelog:
+
+```
+v3.3.0
+
+Add support for XWR18XX devices. SDK version: 3.2.0.4.
+
+v3.2.2
+Fix bugs and update README.
+
+v3.2.1
+Support camera overlay over 3D 1443s.
+
+v3.2.0
+Added camera overlay support.
+
+v3.1.0
+Strengthened code.
+
+v3.0.0
+Added README.
+Improved rviz looking for point cloud data.
+Added support for multiple radars working together. 
+Improved radar's all around working conditions.
+
+v2.0.0
+Added support for ES2.0 EVM devices.
+
+v1.0.0
+Added Doppler from TI's mmWave radars.
 ```
