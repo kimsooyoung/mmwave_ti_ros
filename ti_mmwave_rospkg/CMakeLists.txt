@@ -141,9 +141,9 @@ add_definitions(${PCL_DEFINITIONS})
 
 ## Declare a C++ library
 add_library(mmwave
-  src/mmWaveDataHdl.cpp
-  src/mmWaveCommSrv.cpp
   src/DataHandlerClass.cpp
+  src/mmWaveCommSrv.cpp
+  src/mmWaveDataHdl.cpp
   src/mmWaveQuickConfig.cpp
   src/ParameterParser.cpp
 )
