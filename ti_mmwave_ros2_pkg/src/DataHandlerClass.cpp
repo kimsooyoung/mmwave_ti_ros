@@ -7,6 +7,7 @@
 * \par
 * NOTE:
 * (C) Copyright 2020 Texas Instruments, Inc.
+* ROS 2 Copyright 2022 Swimming Kim, Inc.
 *
 * Redistribution and use in source and binary forms, with or without
 * modification, are permitted provided that the following conditions
@@ -36,32 +37,37 @@
 * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-#include <DataHandlerClass.h>
 
-DataUARTHandler::DataUARTHandler(ros::NodeHandle* nh) : currentBufp(&pingPongBuffers[0]) , nextBufp(&pingPongBuffers[1]) {
-    DataUARTHandler_pub = nh->advertise<sensor_msgs::PointCloud2>("/ti_mmwave/radar_scan_pcl", 100);
-    radar_scan_pub = nh->advertise<ti_mmwave_rospkg::RadarScan>("/ti_mmwave/radar_scan", 100);
-    marker_pub = nh->advertise<visualization_msgs::Marker>("/ti_mmwave/radar_scan_markers", 100);
+#include "ti_mmwave_ros2_pkg/DataHandlerClass.h"
+
+DataUARTHandler::DataUARTHandler() : rclcpp::Node("DataUARTHandler"), currentBufp(&pingPongBuffers[0]) , nextBufp(&pingPongBuffers[1]) {
+    DataUARTHandler_pub = create_publisher<sensor_msgs::msg::PointCloud2>("/ti_mmwave/radar_scan_pcl", 100);
+    radar_scan_pub = create_publisher<ti_mmwave_ros2_interfaces::msg::RadarScan>("/ti_mmwave/radar_scan", 100);
+    marker_pub = create_publisher<visualization_msgs::msg::Marker>("/ti_mmwave/radar_scan_markers", 100);
+
     maxAllowedElevationAngleDeg = 90; // Use max angle if none specified
     maxAllowedAzimuthAngleDeg = 90; // Use max angle if none specified
 
     // Wait for parameters
-    while(!nh->hasParam("/ti_mmwave/doppler_vel_resolution")){}
+    while(!this->has_parameter("/ti_mmwave/doppler_vel_resolution")){}
 
-    nh->getParam("/ti_mmwave/numAdcSamples", nr);
-    nh->getParam("/ti_mmwave/numLoops", nd);
-    nh->getParam("/ti_mmwave/num_TX", ntx);
-    nh->getParam("/ti_mmwave/f_s", fs);
-    nh->getParam("/ti_mmwave/f_c", fc);
-    nh->getParam("/ti_mmwave/BW", BW);
-    nh->getParam("/ti_mmwave/PRI", PRI);
-    nh->getParam("/ti_mmwave/t_fr", tfr);
-    nh->getParam("/ti_mmwave/max_range", max_range);
-    nh->getParam("/ti_mmwave/range_resolution", vrange);
-    nh->getParam("/ti_mmwave/max_doppler_vel", max_vel);
-    nh->getParam("/ti_mmwave/doppler_vel_resolution", vvel);
+    nr = this->declare_parameter("/ti_mmwave/numAdcSamples", 0);
+    nd = this->declare_parameter("/ti_mmwave/numLoops", 0);
+    ntx = this->declare_parameter("/ti_mmwave/num_TX", 0);
 
-    ROS_INFO("\n\n==============================\nList of parameters\n==============================\nNumber of range samples: %d\nNumber of chirps: %d\nf_s: %.3f MHz\nf_c: %.3f GHz\nBandwidth: %.3f MHz\nPRI: %.3f us\nFrame time: %.3f ms\nMax range: %.3f m\nRange resolution: %.3f m\nMax Doppler: +-%.3f m/s\nDoppler resolution: %.3f m/s\n==============================\n", \
+    fs = this->declare_parameter("/ti_mmwave/f_s", 0.0);
+    fc = this->declare_parameter("/ti_mmwave/f_c", 0.0);
+
+    BW = this->declare_parameter("/ti_mmwave/BW", 0.0);
+    PRI = this->declare_parameter("/ti_mmwave/PRI", 0.0);
+    tfr = this->declare_parameter("/ti_mmwave/t_fr", 0.0);
+
+    max_range = this->declare_parameter("/ti_mmwave/max_range", 0.0);
+    vrange = this->declare_parameter("/ti_mmwave/range_resolution", 0.0);
+    max_vel = this->declare_parameter("/ti_mmwave/max_doppler_vel", 0.0);
+    vvel = this->declare_parameter("/ti_mmwave/doppler_vel_resolution", 0.0);
+
+    RCLCPP_INFO(this->get_logger(), "\n\n==============================\nList of parameters\n==============================\nNumber of range samples: %d\nNumber of chirps: %d\nf_s: %.3f MHz\nf_c: %.3f GHz\nBandwidth: %.3f MHz\nPRI: %.3f us\nFrame time: %.3f ms\nMax range: %.3f m\nRange resolution: %.3f m\nMax Doppler: +-%.3f m/s\nDoppler resolution: %.3f m/s\n==============================\n", \
         nr, nd, fs/1e6, fc/1e9, BW/1e6, PRI*1e6, tfr*1e3, max_range, vrange, max_vel/2, vvel);
 }
 
@@ -108,24 +114,26 @@ void *DataUARTHandler::readIncomingData(void)
     {
         mySerialObject.open();
     } catch (std::exception &e1) {
-        ROS_INFO("DataUARTHandler Read Thread: Failed to open Data serial port with error: %s", e1.what());
-        ROS_INFO("DataUARTHandler Read Thread: Waiting 20 seconds before trying again...");
+        RCLCPP_INFO(this->get_logger(), "DataUARTHandler Read Thread: Failed to open Data serial port with error: %s", e1.what());
+        RCLCPP_INFO(this->get_logger(), "DataUARTHandler Read Thread: Waiting 20 seconds before trying again...");
         try
         {
             // Wait 20 seconds and try to open serial port again
-            ros::Duration(20).sleep();
+            // ros::Duration(20).sleep();
+            rclcpp::sleep_for(std::chrono::milliseconds(20000));
             mySerialObject.open();
         } catch (std::exception &e2) {
-            ROS_ERROR("DataUARTHandler Read Thread: Failed second time to open Data serial port, error: %s", e1.what());
-            ROS_ERROR("DataUARTHandler Read Thread: Port could not be opened. Port is \"%s\" and baud rate is %d", dataSerialPort, dataBaudRate);
+            RCLCPP_INFO(this->get_logger(), "DataUARTHandler Read Thread: Failed second time to open Data serial port, error: %s", e1.what());
+            RCLCPP_INFO(this->get_logger(), "DataUARTHandler Read Thread: Port could not be opened. Port is \"%s\" and baud rate is %d", dataSerialPort, dataBaudRate);
+
             pthread_exit(NULL);
         }
     }
     
     if(mySerialObject.isOpen())
-        ROS_INFO("DataUARTHandler Read Thread: Port is open");
+        RCLCPP_INFO(this->get_logger(), "DataUARTHandler Read Thread: Port is open");
     else
-        ROS_ERROR("DataUARTHandler Read Thread: Port could not be opened");
+        RCLCPP_ERROR(this->get_logger(), "DataUARTHandler Read Thread: Port could not be opened");
     
     /*Quick magicWord check to synchronize program with data Stream*/
     while(!isMagicWord(last8Bytes))
@@ -145,7 +153,7 @@ void *DataUARTHandler::readIncomingData(void)
     /*Lock nextBufp before entering main loop*/
     pthread_mutex_lock(&nextBufp_mutex);
     
-    while(ros::ok())
+    while(rclcpp::ok())
     {
         /*Start reading UART data and writing to buffer while also checking for magicWord*/
         last8Bytes[0] = last8Bytes[1];
@@ -231,7 +239,7 @@ int DataUARTHandler::isMagicWord(uint8_t last8Bytes[8])
 
 void *DataUARTHandler::syncedBufferSwap(void)
 {
-    while(ros::ok())
+    while(rclcpp::ok())
     {
         pthread_mutex_lock(&countSync_mutex);
     
@@ -273,13 +281,14 @@ void *DataUARTHandler::sortIncomingData( void )
     uint32_t headerSize;
     unsigned int currentDatap = 0;
     SorterState sorterState = READ_HEADER;
-    int i = 0, tlvCount = 0; //, offset = 0;
+    uint i = 0, tlvCount = 0; //, offset = 0;
     int j = 0;
     float maxElevationAngleRatioSquared;
     float maxAzimuthAngleRatio;
     
     boost::shared_ptr<pcl::PointCloud<pcl::PointXYZI>> RScan(new pcl::PointCloud<pcl::PointXYZI>);
-    ti_mmwave_rospkg::RadarScan radarscan;
+    sensor_msgs::msg::PointCloud2 output_pointcloud;
+    ti_mmwave_ros2_interfaces::msg::RadarScan radarscan;
 
     //wait for first packet to arrive
     pthread_mutex_lock(&countSync_mutex);
@@ -288,7 +297,7 @@ void *DataUARTHandler::sortIncomingData( void )
     
     pthread_mutex_lock(&currentBufp_mutex);
     
-    while(ros::ok())
+    while(rclcpp::ok())
     {
         
         switch(sorterState)
@@ -461,7 +470,7 @@ void *DataUARTHandler::sortIncomingData( void )
                     RScan->points[i].intensity = temp[5];
                     
                     radarscan.header.frame_id = frameID;
-                    radarscan.header.stamp = ros::Time::now();
+                    radarscan.header.stamp = this->now();
 
                     radarscan.point_id = i;
                     radarscan.x = temp[1];
@@ -495,7 +504,7 @@ void *DataUARTHandler::sortIncomingData( void )
                     RScan->points[i].z = mmwData.newObjOut.z;   // ROS standard coordinate system Z-axis is up which is the same as mmWave sensor Z-axis
 
                     radarscan.header.frame_id = frameID;
-                    radarscan.header.stamp = ros::Time::now();
+                    radarscan.header.stamp = this->now();
 
                     radarscan.point_id = i;
                     radarscan.x = mmwData.newObjOut.y;
@@ -520,7 +529,7 @@ void *DataUARTHandler::sortIncomingData( void )
                                     (RScan->points[i].x != 0)
                            )
                 {
-                    radar_scan_pub.publish(radarscan);
+                    radar_scan_pub->publish(radarscan);
                 }
                 i++;
             }
@@ -677,8 +686,10 @@ void *DataUARTHandler::sortIncomingData( void )
                     
                     //ROS_INFO("mmwData.numObjOut after = %d", mmwData.numObjOut);
                     //ROS_INFO("DataUARTHandler Sort Thread: number of obj = %d", mmwData.numObjOut );
-                    
-                    DataUARTHandler_pub.publish(RScan);
+                    pcl::PCLPointCloud2 cloud_ROI;
+                    pcl::toPCLPointCloud2(*RScan, cloud_ROI);
+                    pcl_conversions::fromPCL(cloud_ROI, output_pointcloud);
+                    DataUARTHandler_pub->publish(output_pointcloud);
                 }
 
                 //ROS_INFO("DataUARTHandler Sort Thread : CHECK_TLV_TYPE state says tlvCount max was reached, going to switch buffer state");
@@ -806,32 +817,32 @@ void DataUARTHandler::start(void)
     iret1 = pthread_create( &uartThread, NULL, this->readIncomingData_helper, this);
     if(iret1)
     {
-     ROS_INFO("Error - pthread_create() return code: %d\n",iret1);
-     ros::shutdown();
+        RCLCPP_INFO(this->get_logger(), "Error - pthread_create() return code: %d\n",iret1);
+        rclcpp::shutdown();
     }
     
     iret2 = pthread_create( &sorterThread, NULL, this->sortIncomingData_helper, this);
     if(iret2)
     {
-        ROS_INFO("Error - pthread_create() return code: %d\n",iret1);
-        ros::shutdown();
+        RCLCPP_INFO(this->get_logger(), "Error - pthread_create() return code: %d\n",iret1);
+        rclcpp::shutdown();
     }
     
     iret3 = pthread_create( &swapThread, NULL, this->syncedBufferSwap_helper, this);
     if(iret3)
     {
-        ROS_INFO("Error - pthread_create() return code: %d\n",iret1);
-        ros::shutdown();
+        RCLCPP_INFO(this->get_logger(), "Error - pthread_create() return code: %d\n",iret1);
+        rclcpp::shutdown();
     }
     
-    ros::spin();
+    // rclcpp::spin();
 
     pthread_join(iret1, NULL);
-    ROS_INFO("DataUARTHandler Read Thread joined");
+    RCLCPP_INFO(this->get_logger(), "DataUARTHandler Read Thread joined");
     pthread_join(iret2, NULL);
-    ROS_INFO("DataUARTHandler Sort Thread joined");
+    RCLCPP_INFO(this->get_logger(), "DataUARTHandler Sort Thread joined");
     pthread_join(iret3, NULL);
-    ROS_INFO("DataUARTHandler Swap Thread joined");
+    RCLCPP_INFO(this->get_logger(), "DataUARTHandler Swap Thread joined");
     
     pthread_mutex_destroy(&countSync_mutex);
     pthread_mutex_destroy(&nextBufp_mutex);
@@ -858,14 +869,15 @@ void* DataUARTHandler::syncedBufferSwap_helper(void *context)
     return (static_cast<DataUARTHandler*>(context)->syncedBufferSwap());
 }
 
-void DataUARTHandler::visualize(const ti_mmwave_rospkg::RadarScan &msg){
-    visualization_msgs::Marker marker;
+void DataUARTHandler::visualize(const ti_mmwave_ros2_interfaces::msg::RadarScan &msg){
+    // visualization_msgs::msg::Marker marker;
+    auto marker = visualization_msgs::msg::Marker();
 
     marker.header.frame_id = frameID;
-    marker.header.stamp = ros::Time::now();
+    marker.header.stamp = this->now();
     marker.id = msg.point_id;
-    marker.type = visualization_msgs::Marker::SPHERE;
-    marker.lifetime = ros::Duration(tfr);
+    marker.type = visualization_msgs::msg::Marker::SPHERE;
+    marker.lifetime = rclcpp::Duration(tfr, 0);
     marker.action = marker.ADD;
 
     marker.pose.position.x = msg.x;
@@ -886,5 +898,5 @@ void DataUARTHandler::visualize(const ti_mmwave_rospkg::RadarScan &msg){
     marker.color.g = (int) 255 * msg.intensity;
     marker.color.b = 1;
 
-    marker_pub.publish(marker);
+    marker_pub->publish(marker);
 }

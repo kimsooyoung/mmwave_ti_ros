@@ -60,6 +60,7 @@ void ParameterParser::ParamsParser(ti_mmwave_rospkg::mmWaveCLI &srv, ros::NodeHa
         v.push_back(token);
         if (i > 0) {
             if (!req.compare("profileCfg")) {
+                // profileCfg 0 77 39 7 57.14 0 0 70 1 240 4884 0 0 30
                 switch (i) {
                     case 2:
                         nh.setParam("/ti_mmwave/startFreq", std::stof(token)); break;

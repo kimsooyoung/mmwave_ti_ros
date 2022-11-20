@@ -16,9 +16,74 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 endif()
 
 # find dependencies
-find_package(std_msgs REQUIRED)
 find_package(ament_cmake REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
+
+find_package(rclcpp REQUIRED)
+find_package(rclcpp_components REQUIRED)
+find_package(composition REQUIRED)
+
+find_package(pcl_conversions REQUIRED)
+find_package(std_msgs REQUIRED)
+find_package(sensor_msgs REQUIRED)
+find_package(visualization_msgs REQUIRED)
+find_package(ti_mmwave_ros2_interfaces REQUIRED)
+
+find_package(serial REQUIRED)
+
+find_package(Boost REQUIRED)
+
+find_package(Threads REQUIRED)
+
+find_package(PCL 1.7.2 REQUIRED)
+
+##### added ######
+
+include_directories(include
+  ${PCL_INCLUDE_DIRS}
+  ${pthread_INCLUDE_DIRS}
+  ${rt_INCLUDE_DIRS}
+)
+
+link_directories( ${Boost_LIBRARIES_DIRS} )
+
+link_directories( ${PCL_LIBRARY_DIRS} )
+
+add_definitions(${PCL_DEFINITIONS})
+
+add_library(mmwave SHARED 
+  src/DataHandlerClass.cpp
+  src/mmWaveDataHdl.cpp
+)
+target_compile_definitions(mmwave PRIVATE "COMPOSITION_BUILDING_DLL")
+ament_target_dependencies(mmwave
+  rclcpp
+  rclcpp_components
+  sensor_msgs
+  visualization_msgs
+  std_msgs
+  # pcl_ros
+  pcl_conversions
+  ti_mmwave_ros2_interfaces
+  serial
+)
+target_link_libraries(mmwave
+  ${serial_LIBRARIES}
+)
+rclcpp_components_register_nodes(mmwave "ti_mmwave_ros2_pkg::mmWaveDataHdl")
+set(node_plugins "${node_plugins}ti_mmwave_ros2_pkg::mmWaveDataHdl;$<TARGET_FILE:mmwave>\n")
+
+install(TARGETS
+  mmwave
+  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION lib
+  RUNTIME DESTINATION bin)
+
+# Install launch files.
+install(DIRECTORY
+  launch
+  DESTINATION share/${PROJECT_NAME}
+)
 
 # uncomment the following section in order to fill in
 # further dependencies manually.
@@ -36,10 +101,10 @@ if(BUILD_TESTING)
   ament_lint_auto_find_test_dependencies()
 endif()
 
-rosidl_generate_interfaces(${PROJECT_NAME}
-  "msg/RadarScan.msg"
-  "srv/MMWaveCLI.srv"
-  DEPENDENCIES std_msgs
- )
+
+# # This CMake code is only required when you want to use
+# # interfaces in the same package as the one in which they are used.
+# rosidl_target_interfaces(mmwave
+#   ${PROJECT_NAME} "rosidl_typesupport_cpp")
 
 ament_package()

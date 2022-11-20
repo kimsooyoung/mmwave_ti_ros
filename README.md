@@ -1,5 +1,10 @@
 # TI mmWave ROS Package (Customized)
 
+```
+sudo apt-get install libpthread-stubs0-dev
+sudo apt install ros-eloquent-perception-pcl 
+```
+
 #### Based on updates from Dr. Leo Zhang (University of Arizona)
 ---
 ### Most recent change from Dr. Zhang:
