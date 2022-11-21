@@ -52,7 +52,7 @@ void mmWaveCommSrv::onInit() {
   mySerialPort = this->declare_parameter("command_port", "/dev/ttyUSB0");
 
   myBaudRate = this->declare_parameter("command_rate", 115200);
-  mmWaveCLIName = this->declare_parameter("mmWaveCLI_name", "/mmWaveCLI");
+  mmWaveCLIName = this->declare_parameter("mmWaveCLI_name", "mmWaveCLI");
 
   RCLCPP_INFO(this->get_logger(), "mmWaveCommSrv: command_port = %s",
               mySerialPort.c_str());
@@ -74,7 +74,7 @@ void mmWaveCommSrv::commSrv_cb(
     std::shared_ptr<ti_mmwave_ros2_interfaces::srv::MMWaveCLI::Request> req,
     std::shared_ptr<ti_mmwave_ros2_interfaces::srv::MMWaveCLI::Response> res) {
 
-  RCLCPP_INFO(this->get_logger(),
+  RCLCPP_DEBUG(this->get_logger(),
               "mmWaveCommSrv: Port is \"%s\" and baud rate is %d",
               mySerialPort.c_str(), myBaudRate);
 
@@ -120,7 +120,7 @@ void mmWaveCommSrv::commSrv_cb(
               req->comm.c_str());
 
   req->comm.append("\n");
-//   int bytesSent = mySerialObject.write(req->comm.c_str());
+  mySerialObject.write(req->comm.c_str());
 
   /*Read output from mmwDemo*/
   mySerialObject.readline(res->resp, 1024, ":/>");

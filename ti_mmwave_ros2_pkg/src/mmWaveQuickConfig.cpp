@@ -55,7 +55,9 @@ int main(int argc, char **argv) {
   rclcpp::executors::SingleThreadedExecutor exec;
   rclcpp::NodeOptions options;
 
-  if (argc != 2) {
+  // std::cout << "argc : " << argc << std::endl;
+
+  if (argc < 3) {
     std::cout << "mmWaveQuickConfig: usage: mmWaveQuickConfig "
                  "/file_directory/params.cfg"
               << std::endl;
@@ -124,6 +126,8 @@ int main(int argc, char **argv) {
             std::regex_match(request->comm, std::regex("^\\s*")))) {
         // ROS_INFO("mmWaveQuickConfig: Sending command: '%s'",
         // request->comm.c_str() );
+
+        std::cout << "request->comm : " << request->comm << std::endl;
         auto result_future = client->async_send_request(request);
 
         // foxy : rclcpp::FutureReturnCode::SUCCESS

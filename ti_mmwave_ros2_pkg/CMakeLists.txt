@@ -36,23 +36,23 @@ find_package(Boost 1.65.1 REQUIRED)
 find_package(Threads REQUIRED)
 
 find_package(PCL 1.7.2 REQUIRED)
+
 # message(${PCL_VERSION_PRETTY})
 
-##### added ######
-
+# #### added ######
 include_directories(include
   ${PCL_INCLUDE_DIRS}
   ${pthread_INCLUDE_DIRS}
   ${rt_INCLUDE_DIRS}
 )
 
-link_directories( ${Boost_LIBRARIES_DIRS} )
+link_directories(${Boost_LIBRARIES_DIRS})
 
-link_directories( ${PCL_LIBRARY_DIRS} )
+link_directories(${PCL_LIBRARY_DIRS})
 
 add_definitions(${PCL_DEFINITIONS})
 
-add_library(mmwave SHARED 
+add_library(mmwave SHARED
   src/mmWaveDataHdl.cpp
   src/mmWaveCommSrv.cpp
   src/DataHandlerClass.cpp
@@ -66,6 +66,7 @@ ament_target_dependencies(mmwave
   sensor_msgs
   visualization_msgs
   std_msgs
+
   # pcl_ros
   pcl_conversions
   ti_mmwave_ros2_interfaces
@@ -83,7 +84,7 @@ set(node_plugins "${node_plugins}ti_mmwave_ros2_pkg::mmWaveCommSrv;$<TARGET_FILE
 # mmWaveLoader
 add_executable(${PROJECT_NAME} src/mmWaveLoader.cpp)
 target_link_libraries(${PROJECT_NAME} mmwave)
-ament_target_dependencies(${PROJECT_NAME} 
+ament_target_dependencies(${PROJECT_NAME}
   rclcpp
   rclcpp_components
   sensor_msgs
@@ -96,7 +97,7 @@ ament_target_dependencies(${PROJECT_NAME}
 
 add_executable(mmWaveQuickConfig src/mmWaveQuickConfig.cpp)
 target_link_libraries(mmWaveQuickConfig mmwave)
-ament_target_dependencies(mmWaveQuickConfig 
+ament_target_dependencies(mmWaveQuickConfig
   rclcpp
   rclcpp_components
   sensor_msgs
@@ -116,34 +117,35 @@ install(TARGETS
 # Install launch files.
 install(DIRECTORY
   launch
+  cfg
   DESTINATION share/${PROJECT_NAME}
 )
 
-install(TARGETS
-  ${PROJECT_NAME}
-  DESTINATION lib/${PROJECT_NAME}
+install(
+  TARGETS
+    ${PROJECT_NAME}
+  mmWaveQuickConfig
+  DESTINATION
+    lib/${PROJECT_NAME}
 )
 
 # uncomment the following section in order to fill in
 # further dependencies manually.
 # find_package(<dependency> REQUIRED)
-
-
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
+
   # the following line skips the linter which checks for copyrights
   # uncomment the line when a copyright and license is not present in all source files
-  #set(ament_cmake_copyright_FOUND TRUE)
+  # set(ament_cmake_copyright_FOUND TRUE)
   # the following line skips cpplint (only works in a git repo)
   # uncomment the line when this package is not in a git repo
-  #set(ament_cmake_cpplint_FOUND TRUE)
+  # set(ament_cmake_cpplint_FOUND TRUE)
   ament_lint_auto_find_test_dependencies()
 endif()
-
 
 # # This CMake code is only required when you want to use
 # # interfaces in the same package as the one in which they are used.
 # rosidl_target_interfaces(mmwave
-#   ${PROJECT_NAME} "rosidl_typesupport_cpp")
-
+# ${PROJECT_NAME} "rosidl_typesupport_cpp")
 ament_package()

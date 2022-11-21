@@ -129,6 +129,17 @@ void ParameterParser::CalParams() {
   float max_vel = c0 / (2 * fc * PRI) / ntx;
   float vvel = max_vel / nd;
 
+  this->declare_parameter("/ti_mmwave/num_TX");
+  this->declare_parameter("/ti_mmwave/f_s");
+  this->declare_parameter("/ti_mmwave/f_c");
+  this->declare_parameter("/ti_mmwave/BW");
+  this->declare_parameter("/ti_mmwave/PRI");
+  this->declare_parameter("/ti_mmwave/t_fr");
+  this->declare_parameter("/ti_mmwave/max_range");
+  this->declare_parameter("/ti_mmwave/range_resolution");
+  this->declare_parameter("/ti_mmwave/max_doppler_vel");
+  this->declare_parameter("/ti_mmwave/doppler_vel_resolution");
+
   this->set_parameter(rclcpp::Parameter("/ti_mmwave/num_TX", ntx));
   this->set_parameter(rclcpp::Parameter("/ti_mmwave/f_s", fs));
   this->set_parameter(rclcpp::Parameter("/ti_mmwave/f_c", fc));

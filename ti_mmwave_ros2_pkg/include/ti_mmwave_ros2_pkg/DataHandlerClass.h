@@ -1,8 +1,8 @@
 #ifndef _DATA_HANDLER_CLASS_
 #define _DATA_HANDLER_CLASS_
 
-#include "ti_mmwave_ros2_pkg/visibility_control.h"
 #include "ti_mmwave_ros2_interfaces/msg/radar_scan.hpp"
+#include "ti_mmwave_ros2_pkg/visibility_control.h"
 // #include "more_interfaces/msg/address_book.hpp"
 #include "ti_mmwave_ros2_pkg/mmWave.hpp"
 // #include <boost/bind/bind.hpp>
@@ -25,50 +25,55 @@
 #include <visualization_msgs/msg/marker.hpp>
 #define COUNT_SYNC_MAX 2
 
-class DataUARTHandler : public rclcpp::Node {
+using PointCloud2 = sensor_msgs::msg::PointCloud2;
+using RadarScan = ti_mmwave_ros2_interfaces::msg::RadarScan;
+using Marker = visualization_msgs::msg::Marker;
+
+class DataUARTHandler {
 
 public:
   /*Constructor*/
   // void DataUARTHandler(ros::NodeHandle* nh) :
   // currentBufp(&pingPongBuffers[0]) , nextBufp(&pingPongBuffers[1]) {}
-  COMPOSITION_PUBLIC
   // DataUARTHandler(ros::NodeHandle *nh);
+  COMPOSITION_PUBLIC
   DataUARTHandler();
 
-  COMPOSITION_LOCAL
+  //
+  COMPOSITION_PUBLIC
+  void getPublishers(
+      const rclcpp::Publisher<PointCloud2>::SharedPtr DataUARTHandler_pub_in,
+      const rclcpp::Publisher<RadarScan>::SharedPtr radar_scan_pub_in,
+      const rclcpp::Publisher<Marker>::SharedPtr marker_pub_in);
+
+  void setParameter(int nr_in, int nd_in, int ntx_in, float fs_in, float fc_in,
+                    float BW_in, float PRI_in, float tfr_in, float max_range_in,
+                    float vrange_in, float max_vel_in, float vvel_in);
+
   void setFrameID(char *myFrameID);
 
   /*User callable function to set the UARTPort*/
-  COMPOSITION_LOCAL
   void setUARTPort(char *mySerialPort);
 
   /*User callable function to set the BaudRate*/
-  COMPOSITION_LOCAL
   void setBaudRate(int myBaudRate);
 
   /*User callable function to set maxAllowedElevationAngleDeg*/
-  COMPOSITION_LOCAL
   void setMaxAllowedElevationAngleDeg(int myMaxAllowedElevationAngleDeg);
 
   /*User callable function to set maxAllowedElevationAngleDeg*/
-  COMPOSITION_LOCAL
   void setMaxAllowedAzimuthAngleDeg(int myMaxAllowedAzimuthAngleDeg);
 
-  COMPOSITION_LOCAL
   // void setNodeHandle(ros::NodeHandle *nh);
 
   /*User callable function to start the handler's internal threads*/
-  COMPOSITION_LOCAL
   void start(void);
 
   /*Helper functions to allow pthread compatability*/
-  COMPOSITION_LOCAL
   static void *readIncomingData_helper(void *context);
 
-  COMPOSITION_LOCAL
   static void *sortIncomingData_helper(void *context);
 
-  COMPOSITION_LOCAL
   static void *syncedBufferSwap_helper(void *context);
 
   /*Sorted mmwDemo Data structure*/
@@ -134,29 +139,24 @@ private:
   pthread_cond_t sort_go_cv;
 
   /*Swap Buffer Pointers Thread*/
-  COMPOSITION_LOCAL
   void *syncedBufferSwap(void);
 
   /*Checks if the magic word was found*/
-  COMPOSITION_LOCAL
   int isMagicWord(uint8_t last8Bytes[8]);
 
   /*Read incoming UART Data Thread*/
-  COMPOSITION_LOCAL
   void *readIncomingData(void);
 
   /*Sort incoming UART Data Thread*/
-  COMPOSITION_LOCAL
   void *sortIncomingData(void);
 
-  COMPOSITION_LOCAL
-  void visualize(const ti_mmwave_ros2_interfaces::msg::RadarScan &msg);
+  void visualize(const RadarScan &msg);
 
   // ros::NodeHandle *nodeHandle;
 
-  rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr DataUARTHandler_pub;
-  rclcpp::Publisher<ti_mmwave_ros2_interfaces::msg::RadarScan>::SharedPtr radar_scan_pub;
-  rclcpp::Publisher<visualization_msgs::msg::Marker>::SharedPtr marker_pub;
+  rclcpp::Publisher<PointCloud2>::SharedPtr DataUARTHandler_pub;
+  rclcpp::Publisher<RadarScan>::SharedPtr radar_scan_pub;
+  rclcpp::Publisher<Marker>::SharedPtr marker_pub;
 
   // ros::Publisher DataUARTHandler_pub;
   // ros::Publisher radar_scan_pub;

@@ -35,3 +35,7 @@ ros2 component load /ComponentManager ti_mmwave_ros2_pkg ti_mmwave_ros2_pkg::mmW
 
 ros2 component unload /ComponentManager 1
 ```
+
+```
+ros2 launch ti_mmwave_ros2_pkg 
+```
