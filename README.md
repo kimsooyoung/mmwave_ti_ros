@@ -3,6 +3,10 @@
 ```
 sudo apt-get install libpthread-stubs0-dev
 sudo apt install ros-eloquent-perception-pcl 
+
+cbp serial && roseloq
+cbp ti_mmwave_ros2_interfaces && roseloq
+cbp ti_mmwave_ros2_pkg && roseloq
 ```
 
 #### Based on updates from Dr. Leo Zhang (University of Arizona)
