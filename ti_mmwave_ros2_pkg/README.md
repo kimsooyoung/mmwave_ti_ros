@@ -16,3 +16,20 @@ void DataUARTHandler::start(void)
     
     rclcpp::spin(DataHandler);
 ```
+
+```
+$ ros2 component types
+...
+ti_mmwave_ros2_pkg
+  ti_mmwave_ros2_pkg::mmWaveDataHdl
+
+# terminal 1
+ros2 run rclcpp_components component_container
+ros2 component list
+/ComponentManager
+
+# terminal 2
+ros2 component load /ComponentManager ti_mmwave_ros2_pkg ti_mmwave_ros2_pkg::mmWaveDataHdl
+
+ros2 component unload /ComponentManager 1
+```
