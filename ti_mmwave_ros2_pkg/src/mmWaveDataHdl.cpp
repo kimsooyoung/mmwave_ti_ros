@@ -37,6 +37,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 #include "ti_mmwave_ros2_pkg/mmWaveDataHdl.hpp"
+#include "rcl_interfaces/msg/set_parameters_result.hpp"
 #include "ti_mmwave_ros2_pkg/DataHandlerClass.h"
 
 namespace ti_mmwave_ros2_pkg {
@@ -72,28 +73,54 @@ void mmWaveDataHdl::onInit() {
               myMaxAllowedAzimuthAngleDeg);
 
   // Wait for parameters
-  while (!this->has_parameter("/ti_mmwave/doppler_vel_resolution")) {
+  // 여기서 교착 발생
+  //   while (!this->has_parameter("/ti_mmwave/doppler_vel_resolution")) {
+  //     std::cout << "waiting param" << std::endl;
+  //     rclcpp::sleep_for(std::chrono::seconds(3));
+  //   }
+
+  //   this->set_on_parameters_set_callback(std::bind(
+  //       &mmWaveDataHdl::parametersCallback, this, std::placeholders::_1));
+
+  if (this->has_parameter("/ti_mmwave/doppler_vel_resolution")) {
+    nr = this->get_parameter("/ti_mmwave/numAdcSamples").as_int();
+    nd = this->get_parameter("/ti_mmwave/numLoops").as_int();
+    ntx = this->get_parameter("/ti_mmwave/num_TX").as_int();
+
+    fs = static_cast<float>(this->get_parameter("/ti_mmwave/f_s").as_double());
+    fc = static_cast<float>(this->get_parameter("/ti_mmwave/f_c").as_double());
+
+    BW = static_cast<float>(this->get_parameter("/ti_mmwave/BW").as_double());
+    PRI = static_cast<float>(this->get_parameter("/ti_mmwave/PRI").as_double());
+    tfr =
+        static_cast<float>(this->get_parameter("/ti_mmwave/t_fr").as_double());
+
+    max_range = static_cast<float>(
+        this->get_parameter("/ti_mmwave/max_range").as_double());
+    vrange = static_cast<float>(
+        this->get_parameter("/ti_mmwave/range_resolution").as_double());
+    max_vel = static_cast<float>(
+        this->get_parameter("/ti_mmwave/max_doppler_vel").as_double());
+    vvel = static_cast<float>(
+        this->get_parameter("/ti_mmwave/doppler_vel_resolution").as_double());
+  } else {
+    nr = this->declare_parameter("/ti_mmwave/numAdcSamples", 240);
+    nd = this->declare_parameter("/ti_mmwave/numLoops", 16);
+    ntx = this->declare_parameter("/ti_mmwave/num_TX", 3);
+
+    fs = this->declare_parameter("/ti_mmwave/f_s", 7.5e+06);
+    fc = this->declare_parameter("/ti_mmwave/f_c", 6.23e+10);
+
+    BW = this->declare_parameter("/ti_mmwave/BW", 3.2e+09);
+    PRI = this->declare_parameter("/ti_mmwave/PRI", 8.1e-05);
+    tfr = this->declare_parameter("/ti_mmwave/t_fr", 0.033333);
+
+    max_range = this->declare_parameter("/ti_mmwave/max_range", 11.2422);
+    vrange = this->declare_parameter("/ti_mmwave/range_resolution", 0.0468426);
+    max_vel = this->declare_parameter("/ti_mmwave/max_doppler_vel", 9.90139);
+    vvel =
+        this->declare_parameter("/ti_mmwave/doppler_vel_resolution", 0.618837);
   }
-
-  nr = this->get_parameter("/ti_mmwave/numAdcSamples").as_int();
-  nd = this->get_parameter("/ti_mmwave/numLoops").as_int();
-  ntx = this->get_parameter("/ti_mmwave/num_TX").as_int();
-
-  fs = static_cast<float>(this->get_parameter("/ti_mmwave/f_s").as_double());
-  fc = static_cast<float>(this->get_parameter("/ti_mmwave/f_c").as_double());
-
-  BW = static_cast<float>(this->get_parameter("/ti_mmwave/BW").as_double());
-  PRI = static_cast<float>(this->get_parameter("/ti_mmwave/PRI").as_double());
-  tfr = static_cast<float>(this->get_parameter("/ti_mmwave/t_fr").as_double());
-
-  max_range = static_cast<float>(
-      this->get_parameter("/ti_mmwave/max_range").as_double());
-  vrange = static_cast<float>(
-      this->get_parameter("/ti_mmwave/range_resolution").as_double());
-  max_vel = static_cast<float>(
-      this->get_parameter("/ti_mmwave/max_doppler_vel").as_double());
-  vvel = static_cast<float>(
-      this->get_parameter("/ti_mmwave/doppler_vel_resolution").as_double());
 
   auto DataUARTHandler_pub =
       create_publisher<PointCloud2>("/ti_mmwave/radar_scan_pcl", 100);
@@ -103,20 +130,19 @@ void mmWaveDataHdl::onInit() {
       create_publisher<Marker>("/ti_mmwave/radar_scan_markers", 100);
 
   // 여기서 교착이 발생한다.
-//   DataUARTHandler DataHandler = DataUARTHandler();
+  DataUARTHandler DataHandler = DataUARTHandler();
 
-//   DataHandler.getPublishers(DataUARTHandler_pub, radar_scan_pub, marker_pub);
+  DataHandler.getPublishers(DataUARTHandler_pub, radar_scan_pub, marker_pub);
 
-//   DataHandler.setParameter(nr, nd, ntx, fs, fc, BW, PRI, tfr, max_range, vrange,
-//                            max_vel, vvel);
+  DataHandler.setParameter(nr, nd, ntx, fs, fc, BW, PRI, tfr, max_range, vrange,
+                           max_vel, vvel);
 
-  // auto DataHandler = std::make_shared<DataUARTHandler>();
-  // DataHandler->setFrameID( (char*) myFrameID.c_str() );
-  // DataHandler->setUARTPort( (char*) mySerialPort.c_str() );
-  // DataHandler->setBaudRate( myBaudRate );
-  // DataHandler->setMaxAllowedElevationAngleDeg( myMaxAllowedElevationAngleDeg
-  // ); DataHandler->setMaxAllowedAzimuthAngleDeg( myMaxAllowedAzimuthAngleDeg
-  // );
+  DataHandler.setFrameID((char *)myFrameID.c_str());
+  DataHandler.setUARTPort((char *)mySerialPort.c_str());
+  DataHandler.setBaudRate(myBaudRate);
+  DataHandler.setMaxAllowedElevationAngleDeg(myMaxAllowedElevationAngleDeg);
+  DataHandler.setMaxAllowedAzimuthAngleDeg(myMaxAllowedAzimuthAngleDeg);
+  DataHandler.start();
 
   // while (rclcpp::ok()) {
   //     rclcpp::spin_some(DataHandler);
@@ -124,6 +150,9 @@ void mmWaveDataHdl::onInit() {
 
   RCLCPP_INFO(this->get_logger(), "mmWaveDataHdl: Finished onInit function");
 }
+
+// rcl_interfaces::msg::SetParametersResult mmWaveDataHdl::parametersCallback(
+//     const std::vector<rclcpp::Parameter> &parameters) {}
 
 } // namespace ti_mmwave_ros2_pkg
 

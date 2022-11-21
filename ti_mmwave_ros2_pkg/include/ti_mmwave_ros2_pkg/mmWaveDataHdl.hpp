@@ -63,6 +63,8 @@ namespace ti_mmwave_ros2_pkg {
 class mmWaveDataHdl : public rclcpp::Node {
 public:
   explicit mmWaveDataHdl(const rclcpp::NodeOptions &options);
+  // rcl_interfaces::msg::SetParametersResult
+  // parametersCallback(const std::vector<rclcpp::Parameter> &parameters);
 
 private:
   int nr;

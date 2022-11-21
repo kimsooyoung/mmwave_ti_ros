@@ -24,6 +24,7 @@ public:
 
   void ParamsParser(const std::string &srv);
   void CalParams();
+  void printParam();
 
 private:
   float startFreq;

@@ -39,3 +39,24 @@ ros2 component unload /ComponentManager 1
 ```
 ros2 launch ti_mmwave_ros2_pkg 
 ```
+
+* Quick Config만
+
+```
+ros2 launch ti_mmwave_ros2_pkg eloquent_composition.launch.py
+=> 알아서 잘 꺼짐
+
+ros2 run rclcpp_components component_container
+ros2 component load /ComponentManager ti_mmwave_ros2_pkg ti_mmwave_ros2_pkg::mmWaveCommSrv
+
+ros2 component load /my_container ti_mmwave_ros2_pkg ti_mmwave_ros2_pkg::mmWaveCommSrv
+
+
+```
+
+* mmWaveDataHdl만
+```
+ros2 run rclcpp_components component_container
+
+ros2 component load /ComponentManager ti_mmwave_ros2_pkg ti_mmwave_ros2_pkg::mmWaveDataHdl
+```

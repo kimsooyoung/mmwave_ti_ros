@@ -162,6 +162,7 @@ int main(int argc, char **argv) {
       }
     }
     parser->CalParams();
+    parser->printParam();
     myParams.close();
   } else {
     RCLCPP_ERROR(node->get_logger(),

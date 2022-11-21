@@ -890,14 +890,14 @@ void DataUARTHandler::start(void) {
     rclcpp::shutdown();
   }
 
-  // rclcpp::spin();
+  // rclcpp::spin_some();
 
   pthread_join(iret1, NULL);
-  printf("DataUARTHandler Read Thread joined");
+  printf("DataUARTHandler Read Thread joined\n");
   pthread_join(iret2, NULL);
-  printf("DataUARTHandler Sort Thread joined");
+  printf("DataUARTHandler Sort Thread joined\n");
   pthread_join(iret3, NULL);
-  printf("DataUARTHandler Swap Thread joined");
+  printf("DataUARTHandler Swap Thread joined\n");
 
   pthread_mutex_destroy(&countSync_mutex);
   pthread_mutex_destroy(&nextBufp_mutex);
