@@ -73,7 +73,9 @@ void mmWaveDataHdl::onInit()
     DataHandler->setMaxAllowedElevationAngleDeg( myMaxAllowedElevationAngleDeg );
     DataHandler->setMaxAllowedAzimuthAngleDeg( myMaxAllowedAzimuthAngleDeg );
     
-    rclcpp::spin(DataHandler);
+    while (rclcpp::ok()) {
+        rclcpp::spin_some(DataHandler);
+    }
    
     RCLCPP_INFO(this->get_logger(), "mmWaveDataHdl: Finished onInit function");
 }
