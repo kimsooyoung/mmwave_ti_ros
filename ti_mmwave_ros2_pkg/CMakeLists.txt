@@ -31,11 +31,12 @@ find_package(ti_mmwave_ros2_interfaces REQUIRED)
 
 find_package(serial REQUIRED)
 
-find_package(Boost REQUIRED)
+find_package(Boost 1.65.1 REQUIRED)
 
 find_package(Threads REQUIRED)
 
 find_package(PCL 1.7.2 REQUIRED)
+# message(${PCL_VERSION_PRETTY})
 
 ##### added ######
 
@@ -52,8 +53,11 @@ link_directories( ${PCL_LIBRARY_DIRS} )
 add_definitions(${PCL_DEFINITIONS})
 
 add_library(mmwave SHARED 
-  src/DataHandlerClass.cpp
   src/mmWaveDataHdl.cpp
+  src/mmWaveCommSrv.cpp
+  src/DataHandlerClass.cpp
+  src/mmWaveQuickConfig.cpp
+  src/ParameterParser.cpp
 )
 target_compile_definitions(mmwave PRIVATE "COMPOSITION_BUILDING_DLL")
 ament_target_dependencies(mmwave
@@ -73,6 +77,36 @@ target_link_libraries(mmwave
 rclcpp_components_register_nodes(mmwave "ti_mmwave_ros2_pkg::mmWaveDataHdl")
 set(node_plugins "${node_plugins}ti_mmwave_ros2_pkg::mmWaveDataHdl;$<TARGET_FILE:mmwave>\n")
 
+rclcpp_components_register_nodes(mmwave "ti_mmwave_ros2_pkg::mmWaveCommSrv")
+set(node_plugins "${node_plugins}ti_mmwave_ros2_pkg::mmWaveCommSrv;$<TARGET_FILE:mmwave>\n")
+
+# mmWaveLoader
+add_executable(${PROJECT_NAME} src/mmWaveLoader.cpp)
+target_link_libraries(${PROJECT_NAME} mmwave)
+ament_target_dependencies(${PROJECT_NAME} 
+  rclcpp
+  rclcpp_components
+  sensor_msgs
+  visualization_msgs
+  std_msgs
+  pcl_conversions
+  ti_mmwave_ros2_interfaces
+  serial
+)
+
+add_executable(mmWaveQuickConfig src/mmWaveQuickConfig.cpp)
+target_link_libraries(mmWaveQuickConfig mmwave)
+ament_target_dependencies(mmWaveQuickConfig 
+  rclcpp
+  rclcpp_components
+  sensor_msgs
+  visualization_msgs
+  std_msgs
+  pcl_conversions
+  ti_mmwave_ros2_interfaces
+  serial
+)
+
 install(TARGETS
   mmwave
   ARCHIVE DESTINATION lib
@@ -83,6 +117,11 @@ install(TARGETS
 install(DIRECTORY
   launch
   DESTINATION share/${PROJECT_NAME}
+)
+
+install(TARGETS
+  ${PROJECT_NAME}
+  DESTINATION lib/${PROJECT_NAME}
 )
 
 # uncomment the following section in order to fill in

@@ -51,21 +51,21 @@ DataUARTHandler::DataUARTHandler() : rclcpp::Node("DataUARTHandler"), currentBuf
     // Wait for parameters
     while(!this->has_parameter("/ti_mmwave/doppler_vel_resolution")){}
 
-    nr = this->declare_parameter("/ti_mmwave/numAdcSamples", 0);
-    nd = this->declare_parameter("/ti_mmwave/numLoops", 0);
-    ntx = this->declare_parameter("/ti_mmwave/num_TX", 0);
+    nr = this->get_parameter("/ti_mmwave/numAdcSamples").as_int();
+    nd = this->get_parameter("/ti_mmwave/numLoops").as_int();
+    ntx = this->get_parameter("/ti_mmwave/num_TX").as_int();
 
-    fs = this->declare_parameter("/ti_mmwave/f_s", 0.0);
-    fc = this->declare_parameter("/ti_mmwave/f_c", 0.0);
+    fs = static_cast<float>(this->get_parameter("/ti_mmwave/f_s").as_double());
+    fc = static_cast<float>(this->get_parameter("/ti_mmwave/f_c").as_double());
 
-    BW = this->declare_parameter("/ti_mmwave/BW", 0.0);
-    PRI = this->declare_parameter("/ti_mmwave/PRI", 0.0);
-    tfr = this->declare_parameter("/ti_mmwave/t_fr", 0.0);
+    BW = static_cast<float>(this->get_parameter("/ti_mmwave/BW").as_double());
+    PRI = static_cast<float>(this->get_parameter("/ti_mmwave/PRI").as_double());
+    tfr = static_cast<float>(this->get_parameter("/ti_mmwave/t_fr").as_double());
 
-    max_range = this->declare_parameter("/ti_mmwave/max_range", 0.0);
-    vrange = this->declare_parameter("/ti_mmwave/range_resolution", 0.0);
-    max_vel = this->declare_parameter("/ti_mmwave/max_doppler_vel", 0.0);
-    vvel = this->declare_parameter("/ti_mmwave/doppler_vel_resolution", 0.0);
+    max_range = static_cast<float>(this->get_parameter("/ti_mmwave/max_range").as_double());
+    vrange = static_cast<float>(this->get_parameter("/ti_mmwave/range_resolution").as_double());
+    max_vel = static_cast<float>(this->get_parameter("/ti_mmwave/max_doppler_vel").as_double());
+    vvel = static_cast<float>(this->get_parameter("/ti_mmwave/doppler_vel_resolution").as_double());
 
     RCLCPP_INFO(this->get_logger(), "\n\n==============================\nList of parameters\n==============================\nNumber of range samples: %d\nNumber of chirps: %d\nf_s: %.3f MHz\nf_c: %.3f GHz\nBandwidth: %.3f MHz\nPRI: %.3f us\nFrame time: %.3f ms\nMax range: %.3f m\nRange resolution: %.3f m\nMax Doppler: +-%.3f m/s\nDoppler resolution: %.3f m/s\n==============================\n", \
         nr, nd, fs/1e6, fc/1e9, BW/1e6, PRI*1e6, tfr*1e3, max_range, vrange, max_vel/2, vvel);
@@ -120,7 +120,7 @@ void *DataUARTHandler::readIncomingData(void)
         {
             // Wait 20 seconds and try to open serial port again
             // ros::Duration(20).sleep();
-            rclcpp::sleep_for(std::chrono::milliseconds(20000));
+            rclcpp::sleep_for(std::chrono::seconds(20));
             mySerialObject.open();
         } catch (std::exception &e2) {
             RCLCPP_INFO(this->get_logger(), "DataUARTHandler Read Thread: Failed second time to open Data serial port, error: %s", e1.what());

@@ -41,6 +41,7 @@
 #ifndef MMWAVE_DATA_HDL_H
 #define MMWAVE_DATA_HDL_H
 
+#include "ti_mmwave_ros2_pkg/visibility_control.h"
 /*Include ROS specific headers*/
 #include "rclcpp/rclcpp.hpp"
 #include "std_msgs/msg/string.hpp"

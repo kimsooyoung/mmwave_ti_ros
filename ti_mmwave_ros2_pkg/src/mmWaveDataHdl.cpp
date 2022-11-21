@@ -64,18 +64,19 @@ void mmWaveDataHdl::onInit()
     RCLCPP_INFO(this->get_logger(), "mmWaveDataHdl: data_rate = %d", myBaudRate);
     RCLCPP_INFO(this->get_logger(), "mmWaveDataHdl: max_allowed_elevation_angle_deg = %d", myMaxAllowedElevationAngleDeg);
     RCLCPP_INFO(this->get_logger(), "mmWaveDataHdl: max_allowed_azimuth_angle_deg = %d", myMaxAllowedAzimuthAngleDeg);
-   
+
+    // 여기서 교착이 발생한다.
     // DataUARTHandler DataHandler;
-    auto DataHandler = std::make_shared<DataUARTHandler>();
-    DataHandler->setFrameID( (char*) myFrameID.c_str() );
-    DataHandler->setUARTPort( (char*) mySerialPort.c_str() );
-    DataHandler->setBaudRate( myBaudRate );
-    DataHandler->setMaxAllowedElevationAngleDeg( myMaxAllowedElevationAngleDeg );
-    DataHandler->setMaxAllowedAzimuthAngleDeg( myMaxAllowedAzimuthAngleDeg );
+    // auto DataHandler = std::make_shared<DataUARTHandler>();
+    // DataHandler->setFrameID( (char*) myFrameID.c_str() );
+    // DataHandler->setUARTPort( (char*) mySerialPort.c_str() );
+    // DataHandler->setBaudRate( myBaudRate );
+    // DataHandler->setMaxAllowedElevationAngleDeg( myMaxAllowedElevationAngleDeg );
+    // DataHandler->setMaxAllowedAzimuthAngleDeg( myMaxAllowedAzimuthAngleDeg );
     
-    while (rclcpp::ok()) {
-        rclcpp::spin_some(DataHandler);
-    }
+    // while (rclcpp::ok()) {
+    //     rclcpp::spin_some(DataHandler);
+    // }
    
     RCLCPP_INFO(this->get_logger(), "mmWaveDataHdl: Finished onInit function");
 }

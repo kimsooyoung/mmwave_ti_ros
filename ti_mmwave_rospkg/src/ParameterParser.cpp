@@ -100,17 +100,6 @@ void ParameterParser::ParamsParser(ti_mmwave_rospkg::mmWaveCLI &srv, ros::NodeHa
 
 void ParameterParser::CalParams(ros::NodeHandle &nh) {
     float c0 = 299792458;
-    int chirpStartIdx;
-    int chirpEndIdx;
-    int numLoops;
-    float framePeriodicity;
-    float startFreq;
-    float idleTime;
-    float adcStartTime;
-    float rampEndTime;
-    float digOutSampleRate;
-    float freqSlopeConst;
-    float numAdcSamples;
 
     nh.getParam("/ti_mmwave/startFreq", startFreq);
     nh.getParam("/ti_mmwave/idleTime", idleTime);

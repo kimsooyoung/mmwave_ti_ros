@@ -41,6 +41,7 @@
 #ifndef MMWAVE_COMM_SRV_H
 #define MMWAVE_COMM_SRV_H
 
+#include "ti_mmwave_ros2_pkg/visibility_control.h"
 /*Include ROS specific headers*/
 #include "rclcpp/rclcpp.hpp"
 #include "std_msgs/msg/string.hpp"
@@ -56,7 +57,7 @@
 /*mmWave Driver Headers*/
 #include "ti_mmwave_ros2_interfaces/srv/mm_wave_cli.hpp"
 
-namespace ti_mmwave_rospkg
+namespace ti_mmwave_ros2_pkg
 {
 
 class mmWaveCommSrv : public rclcpp::Node
@@ -71,10 +72,10 @@ class mmWaveCommSrv : public rclcpp::Node
    
    void onInit();
    
-   bool commSrv_cb(ti_mmwave_ros2_interfaces::srv::mmWaveCLI::Request  &req, 
-      ti_mmwave_ros2_interfaces::srv::mmWaveCLI::Response &res);
+   void commSrv_cb(std::shared_ptr<ti_mmwave_ros2_interfaces::srv::MMWaveCLI::Request>  req, 
+      std::shared_ptr<ti_mmwave_ros2_interfaces::srv::MMWaveCLI::Response> res);
    
-   ros::ServiceServer commSrv;
+   rclcpp::Service<ti_mmwave_ros2_interfaces::srv::MMWaveCLI>::SharedPtr commSrv;
    
    std::string mySerialPort;
    

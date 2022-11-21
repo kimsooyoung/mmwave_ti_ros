@@ -31,5 +31,7 @@ ros2 component list
 # terminal 2
 ros2 component load /ComponentManager ti_mmwave_ros2_pkg ti_mmwave_ros2_pkg::mmWaveDataHdl
 
+ros2 component load /ComponentManager ti_mmwave_ros2_pkg ti_mmwave_ros2_pkg::mmWaveCommSrv
+
 ros2 component unload /ComponentManager 1
 ```
