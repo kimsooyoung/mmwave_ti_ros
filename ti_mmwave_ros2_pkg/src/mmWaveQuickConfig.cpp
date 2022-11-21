@@ -68,7 +68,7 @@ int main(int argc, char **argv) {
   auto node = rclcpp::Node::make_shared("mmWaveQuickConfig");
 
   std::string mmWaveCLIName;
-  mmWaveCLIName = node->declare_parameter("mmWaveCLI_name", "mmWaveCLI_name");
+  mmWaveCLIName = node->declare_parameter("mmWaveCLI_name", "/mmWaveCLI");
   auto client = node->create_client<ti_mmwave_ros2_interfaces::srv::MMWaveCLI>(
       mmWaveCLIName);
 

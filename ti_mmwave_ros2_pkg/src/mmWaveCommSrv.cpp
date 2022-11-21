@@ -52,7 +52,7 @@ void mmWaveCommSrv::onInit() {
   mySerialPort = this->declare_parameter("command_port", "/dev/ttyUSB0");
 
   myBaudRate = this->declare_parameter("command_rate", 115200);
-  mmWaveCLIName = this->declare_parameter("mmWaveCLI_name", "/service_name");
+  mmWaveCLIName = this->declare_parameter("mmWaveCLI_name", "/mmWaveCLI");
 
   RCLCPP_INFO(this->get_logger(), "mmWaveCommSrv: command_port = %s",
               mySerialPort.c_str());

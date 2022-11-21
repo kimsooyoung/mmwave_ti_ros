@@ -54,8 +54,8 @@ void mmWaveDataHdl::onInit()
     int myMaxAllowedElevationAngleDeg;
     int myMaxAllowedAzimuthAngleDeg;
    
-    mySerialPort = this->declare_parameter("data_port", "/dev/ttyUSB0");
-    myBaudRate = this->declare_parameter("data_rate", 115200);
+    mySerialPort = this->declare_parameter("data_port", "/dev/ttyUSB1");
+    myBaudRate = this->declare_parameter("data_rate", 921600);
     myFrameID = this->declare_parameter("frame_id", "/ti_mmwave_0");
     myMaxAllowedElevationAngleDeg = this->declare_parameter("max_allowed_elevation_angle_deg", 90);
     myMaxAllowedAzimuthAngleDeg = this->declare_parameter("max_allowed_azimuth_angle_deg", 90);
@@ -67,7 +67,7 @@ void mmWaveDataHdl::onInit()
 
     // 여기서 교착이 발생한다.
     // DataUARTHandler DataHandler;
-    // auto DataHandler = std::make_shared<DataUARTHandler>();
+    auto DataHandler = std::make_shared<DataUARTHandler>();
     // DataHandler->setFrameID( (char*) myFrameID.c_str() );
     // DataHandler->setUARTPort( (char*) mySerialPort.c_str() );
     // DataHandler->setBaudRate( myBaudRate );
