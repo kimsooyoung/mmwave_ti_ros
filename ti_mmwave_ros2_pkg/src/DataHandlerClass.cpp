@@ -42,7 +42,7 @@
 #include <stdio.h>
 
 DataUARTHandler::DataUARTHandler()
-    : currentBufp(&pingPongBuffers[0]), nextBufp(&pingPongBuffers[1]) {
+    : rclcpp::Node("DataUARTHandler"), currentBufp(&pingPongBuffers[0]), nextBufp(&pingPongBuffers[1]) {
   //   DataUARTHandler_pub = create_publisher<sensor_msgs::msg::PointCloud2>(
   //       "/ti_mmwave/radar_scan_pcl", 100);
   //   radar_scan_pub =
@@ -177,6 +177,9 @@ void *DataUARTHandler::readIncomingData(void) {
   pthread_mutex_lock(&nextBufp_mutex);
 
   while (rclcpp::ok()) {
+
+    std::cout << "readIncomingData" << std::endl;
+
     /*Start reading UART data and writing to buffer while also checking for
      * magicWord*/
     last8Bytes[0] = last8Bytes[1];
@@ -256,6 +259,9 @@ int DataUARTHandler::isMagicWord(uint8_t last8Bytes[8]) {
 
 void *DataUARTHandler::syncedBufferSwap(void) {
   while (rclcpp::ok()) {
+
+    std::cout << "syncedBufferSwap" << std::endl;
+
     pthread_mutex_lock(&countSync_mutex);
 
     while (countSync < COUNT_SYNC_MAX) {
@@ -309,6 +315,8 @@ void *DataUARTHandler::sortIncomingData(void) {
   pthread_mutex_lock(&currentBufp_mutex);
 
   while (rclcpp::ok()) {
+
+    std::cout << "sortIncomingData" << std::endl;
 
     switch (sorterState) {
 
@@ -627,14 +635,11 @@ void *DataUARTHandler::sortIncomingData(void) {
 
       break;
 
-    case READ_LOG_MAG_RANGE: {
-
+    case READ_LOG_MAG_RANGE:
       sorterState = CHECK_TLV_TYPE;
-    }
+      break;
 
-    break;
-
-    case READ_NOISE: {
+    case READ_NOISE:
 
       i = 0;
 
@@ -646,11 +651,9 @@ void *DataUARTHandler::sortIncomingData(void) {
       currentDatap += tlvLen;
 
       sorterState = CHECK_TLV_TYPE;
-    }
+      break;
 
-    break;
-
-    case READ_AZIMUTH: {
+    case READ_AZIMUTH:
 
       i = 0;
 
@@ -662,11 +665,9 @@ void *DataUARTHandler::sortIncomingData(void) {
       currentDatap += tlvLen;
 
       sorterState = CHECK_TLV_TYPE;
-    }
+      break;
 
-    break;
-
-    case READ_DOPPLER: {
+    case READ_DOPPLER:
 
       i = 0;
 
@@ -678,11 +679,9 @@ void *DataUARTHandler::sortIncomingData(void) {
       currentDatap += tlvLen;
 
       sorterState = CHECK_TLV_TYPE;
-    }
+      break;
 
-    break;
-
-    case READ_STATS: {
+    case READ_STATS:
 
       i = 0;
 
@@ -694,9 +693,7 @@ void *DataUARTHandler::sortIncomingData(void) {
       currentDatap += tlvLen;
 
       sorterState = CHECK_TLV_TYPE;
-    }
-
-    break;
+      break;
 
     case CHECK_TLV_TYPE:
 
@@ -890,7 +887,10 @@ void DataUARTHandler::start(void) {
     rclcpp::shutdown();
   }
 
-  // rclcpp::spin_some();
+  // rclcpp::spin(shared_from_this());
+  while(1)
+    continue;
+  
 
   pthread_join(iret1, NULL);
   printf("DataUARTHandler Read Thread joined\n");

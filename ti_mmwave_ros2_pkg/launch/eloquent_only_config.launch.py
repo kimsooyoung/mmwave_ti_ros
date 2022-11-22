@@ -35,16 +35,16 @@ def generate_launch_description():
             package='rclcpp_components',
             node_executable='component_container',
             composable_node_descriptions=[
-                ComposableNode(
-                    package='ti_mmwave_ros2_pkg',
-                    node_plugin='ti_mmwave_ros2_pkg::mmWaveCommSrv',
-                    # node_name='mmWaveCommSrv',
-                    parameters=[{
-                        "command_port": "/dev/ttyUSB0",
-                        "command_rate": 115200,
-                        "mmWaveCLI_name": "/mmWaveCLI",
-                    }]
-                ),
+                # ComposableNode(
+                #     package='ti_mmwave_ros2_pkg',
+                #     node_plugin='ti_mmwave_ros2_pkg::mmWaveCommSrv',
+                #     # node_name='mmWaveCommSrv',
+                #     parameters=[{
+                #         "command_port": "/dev/ttyUSB0",
+                #         "command_rate": 115200,
+                #         "mmWaveCLI_name": "/mmWaveCLI",
+                #     }]
+                # ),
                 ComposableNode(
                     package='ti_mmwave_ros2_pkg',
                     node_plugin='ti_mmwave_ros2_pkg::mmWaveDataHdl',
@@ -62,6 +62,6 @@ def generate_launch_description():
     )
 
     return launch.LaunchDescription([
-        container,
         mmwave_quick_config,
+        # container,
     ])

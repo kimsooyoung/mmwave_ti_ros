@@ -54,9 +54,43 @@ ros2 component load /my_container ti_mmwave_ros2_pkg ti_mmwave_ros2_pkg::mmWaveC
 
 ```
 
-* mmWaveDataHdl만
+* mmWaveDataHdl
 ```
 ros2 run rclcpp_components component_container
 
+ros2 launch ti_mmwave_ros2_pkg eloquent_only_config.launch.py
+
 ros2 component load /ComponentManager ti_mmwave_ros2_pkg ti_mmwave_ros2_pkg::mmWaveDataHdl
+
+ros2 component load /ComponentManager ti_mmwave_ros2_pkg ti_mmwave_ros2_pkg::mmWaveCommSrv
+
+ros2 component unload /ComponentManager 1
+
+```
+
+결과
+
+```
+==============================
+DataUARTHandler Read Thread joined
+DataUARTHandler Sort Thread joined
+DataUARTHandler Swap Thread joined
+[INFO] [mmWaveDataHdl]: mmWaveDataHdl: Finished onInit function
+DataUARTHandler Read Thread: Port is open[INFO] [ComponentManager]: Found class: rclcpp_components::NodeFactoryTemplate<ti_mmwave_ros2_pkg::ParameterParser>
+[INFO] [ComponentManager]: Found class: rclcpp_components::NodeFactoryTemplate<ti_mmwave_ros2_pkg::mmWaveCommSrv>
+[INFO] [ComponentManager]: Instantiate class: rclcpp_components::NodeFactoryTemplate<ti_mmwave_ros2_pkg::mmWaveCommSrv>
+[INFO] [mmWaveCommSrv]: mmWaveCommSrv: command_port = /dev/ttyUSB0
+[INFO] [mmWaveCommSrv]: mmWaveCommSrv: command_rate = 115200
+[INFO] [mmWaveCommSrv]: mmWaveCommsrv: Finished onInit function
+component_container: ../nptl/pthread_mutex_lock.c:81: __pthread_mutex_lock: Assertion `mutex->__data.__owner == 0' failed.
+
+```
+
+```
+ros2 run ti_mmwave_ros2_pkg ti_mmwave_ros2_pkg
+ros2 launch ti_mmwave_ros2_pkg eloquent_only_config.launch.py
+```
+
+```
+ros2 launch ti_mmwave_ros2_pkg eloquent_composition.launch.py
 ```

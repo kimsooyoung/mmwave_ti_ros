@@ -29,7 +29,7 @@ using PointCloud2 = sensor_msgs::msg::PointCloud2;
 using RadarScan = ti_mmwave_ros2_interfaces::msg::RadarScan;
 using Marker = visualization_msgs::msg::Marker;
 
-class DataUARTHandler {
+class DataUARTHandler : public rclcpp::Node {
 
 public:
   /*Constructor*/

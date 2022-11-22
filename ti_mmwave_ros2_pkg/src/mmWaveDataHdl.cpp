@@ -79,8 +79,15 @@ void mmWaveDataHdl::onInit() {
   //     rclcpp::sleep_for(std::chrono::seconds(3));
   //   }
 
-  //   this->set_on_parameters_set_callback(std::bind(
-  //       &mmWaveDataHdl::parametersCallback, this, std::placeholders::_1));
+  // this->set_on_parameters_set_callback(std::bind(
+  //     &mmWaveDataHdl::parametersCallback, this, std::placeholders::_1));
+
+//   timer_ =
+//       this->create_wall_timer(std::chrono::milliseconds(200),
+//                               std::bind(&mmWaveDataHdl::timer_callback, this));
+
+  callback_handle_ = this->add_on_set_parameters_callback(std::bind(
+      &mmWaveDataHdl::parametersCallback, this, std::placeholders::_1));
 
   if (this->has_parameter("/ti_mmwave/doppler_vel_resolution")) {
     nr = this->get_parameter("/ti_mmwave/numAdcSamples").as_int();
@@ -130,19 +137,37 @@ void mmWaveDataHdl::onInit() {
       create_publisher<Marker>("/ti_mmwave/radar_scan_markers", 100);
 
   // 여기서 교착이 발생한다.
-  DataUARTHandler DataHandler = DataUARTHandler();
+  //   DataUARTHandler DataHandler = DataUARTHandler();
 
-  DataHandler.getPublishers(DataUARTHandler_pub, radar_scan_pub, marker_pub);
+  //   DataHandler.getPublishers(DataUARTHandler_pub, radar_scan_pub,
+  //   marker_pub);
 
-  DataHandler.setParameter(nr, nd, ntx, fs, fc, BW, PRI, tfr, max_range, vrange,
-                           max_vel, vvel);
+  //   DataHandler.setParameter(nr, nd, ntx, fs, fc, BW, PRI, tfr, max_range,
+  //   vrange,
+  //                            max_vel, vvel);
 
-  DataHandler.setFrameID((char *)myFrameID.c_str());
-  DataHandler.setUARTPort((char *)mySerialPort.c_str());
-  DataHandler.setBaudRate(myBaudRate);
-  DataHandler.setMaxAllowedElevationAngleDeg(myMaxAllowedElevationAngleDeg);
-  DataHandler.setMaxAllowedAzimuthAngleDeg(myMaxAllowedAzimuthAngleDeg);
-  DataHandler.start();
+  //   DataHandler.setFrameID((char *)myFrameID.c_str());
+  //   DataHandler.setUARTPort((char *)mySerialPort.c_str());
+  //   DataHandler.setBaudRate(myBaudRate);
+  //   DataHandler.setMaxAllowedElevationAngleDeg(myMaxAllowedElevationAngleDeg);
+  //   DataHandler.setMaxAllowedAzimuthAngleDeg(myMaxAllowedAzimuthAngleDeg);
+  //   DataHandler.start();
+
+  DataHandler = std::make_shared<DataUARTHandler>();
+  DataHandler->getPublishers(DataUARTHandler_pub, radar_scan_pub, marker_pub);
+
+  DataHandler->setParameter(nr, nd, ntx, fs, fc, BW, PRI, tfr, max_range,
+                            vrange, max_vel, vvel);
+
+  DataHandler->setFrameID((char *)myFrameID.c_str());
+  DataHandler->setUARTPort((char *)mySerialPort.c_str());
+  DataHandler->setBaudRate(myBaudRate);
+  DataHandler->setMaxAllowedElevationAngleDeg(myMaxAllowedElevationAngleDeg);
+  DataHandler->setMaxAllowedAzimuthAngleDeg(myMaxAllowedAzimuthAngleDeg);
+
+  // 이러면 빌드는 되지만 점유를 해버린다. => config등 아무것도 안됨
+  // rclcpp::spin(DataHandler);
+  DataHandler->start();
 
   // while (rclcpp::ok()) {
   //     rclcpp::spin_some(DataHandler);
@@ -151,8 +176,19 @@ void mmWaveDataHdl::onInit() {
   RCLCPP_INFO(this->get_logger(), "mmWaveDataHdl: Finished onInit function");
 }
 
-// rcl_interfaces::msg::SetParametersResult mmWaveDataHdl::parametersCallback(
-//     const std::vector<rclcpp::Parameter> &parameters) {}
+rcl_interfaces::msg::SetParametersResult mmWaveDataHdl::parametersCallback(
+    const std::vector<rclcpp::Parameter> &parameters) {
+  rcl_interfaces::msg::SetParametersResult result;
+  result.successful = true;
+  result.reason = "success";
+
+  std::cout << "SetParametersResult" << std::endl;
+
+  // Here update class attributes, do some actions, etc.
+  return result;
+}
+
+void mmWaveDataHdl::timer_callback() { DataHandler->start(); }
 
 } // namespace ti_mmwave_ros2_pkg
 
