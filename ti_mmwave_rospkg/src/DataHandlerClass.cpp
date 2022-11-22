@@ -154,6 +154,7 @@ void *DataUARTHandler::readIncomingData(void) {
   pthread_mutex_lock(&nextBufp_mutex);
 
   while (ros::ok()) {
+    // std::cout << "readIncomingData" << std::endl;
     /*Start reading UART data and writing to buffer while also checking for
      * magicWord*/
     last8Bytes[0] = last8Bytes[1];
@@ -233,6 +234,9 @@ int DataUARTHandler::isMagicWord(uint8_t last8Bytes[8]) {
 
 void *DataUARTHandler::syncedBufferSwap(void) {
   while (ros::ok()) {
+    
+    // std::cout << "syncedBufferSwap" << std::endl;
+
     pthread_mutex_lock(&countSync_mutex);
 
     while (countSync < COUNT_SYNC_MAX) {
@@ -285,6 +289,7 @@ void *DataUARTHandler::sortIncomingData(void) {
   pthread_mutex_lock(&currentBufp_mutex);
 
   while (ros::ok()) {
+    // std::cout << "sortIncomingData" << std::endl;
 
     switch (sorterState) {
 
@@ -855,7 +860,13 @@ void DataUARTHandler::start(void) {
     ros::shutdown();
   }
 
+  while(1){
+    continue;
+  }
+
   // ros::spin();
+  // while(ros::ok())
+  //   ros::spinOnce();
 
   pthread_join(iret1, NULL);
   ROS_INFO("DataUARTHandler Read Thread joined");

@@ -51,9 +51,9 @@ int main()
     pthread_create(&threadID3, NULL, threadRoutine1, NULL);
     pthread_create(&threadID4, NULL, threadRoutine1, NULL);
 
-    while(1){
-        continue;
-    }
+    // while(1){
+    //     continue;
+    // }
  
     // Join < 뮤텍스 이용 >
     pthread_join(threadID1, NULL);
