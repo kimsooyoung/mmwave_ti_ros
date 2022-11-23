@@ -4,8 +4,9 @@ import launch
 from launch import LaunchDescription
 from launch_ros.actions import Node
 
-from launch_ros.actions import ComposableNodeContainer
+from launch.actions import TimerAction
 from launch_ros.descriptions import ComposableNode
+from launch_ros.actions import ComposableNodeContainer
 
 from ament_index_python.packages import get_package_share_directory
 
@@ -16,16 +17,37 @@ def generate_launch_description():
 
     pkg_dir_path = get_package_share_directory('ti_mmwave_ros2_pkg')
     cfg_file_path = os.path.join(pkg_dir_path, 'cfg', cfg_file)
+    rviz_config_file = os.path.join(pkg_dir_path, 'rviz', 'mmwave_3d_view.rviz')
 
     mmwave_quick_config = Node(
         package='ti_mmwave_ros2_pkg',
         node_executable='mmWaveQuickConfig',
-        # node_name='mmwave_quick_config',
+        node_name='mmwave_quick_config',
         output='screen',
         arguments=[cfg_file_path],
         parameters=[{
             "mmWaveCLI_name": "/mmWaveCLI",
         }],
+    )
+
+    mmwave_comm_srv_node = Node(
+        package='ti_mmwave_ros2_pkg',
+        node_executable='mmwave_comm_srv_node',
+        node_name='mmwave_comm_srv_node',
+        output='screen',
+        parameters=[{
+            "command_port": "/dev/ttyUSB0",
+            "command_rate": 115200,
+            "mmWaveCLI_name": "/mmWaveCLI",
+        }],
+    )
+
+    rviz2 = Node(
+        package='rviz2',
+        node_executable='rviz2',
+        node_name='rviz2',
+        arguments=['-d', rviz_config_file],
+        parameters=[{'use_sim_time': False}],
     )
 
     """Generate launch description with multiple components."""
@@ -35,16 +57,6 @@ def generate_launch_description():
             package='rclcpp_components',
             node_executable='component_container',
             composable_node_descriptions=[
-                ComposableNode(
-                    package='ti_mmwave_ros2_pkg',
-                    node_plugin='ti_mmwave_ros2_pkg::mmWaveCommSrv',
-                    # node_name='mmWaveCommSrv',
-                    parameters=[{
-                        "command_port": "/dev/ttyUSB0",
-                        "command_rate": 115200,
-                        "mmWaveCLI_name": "/mmWaveCLI",
-                    }]
-                ),
                 ComposableNode(
                     package='ti_mmwave_ros2_pkg',
                     node_plugin='ti_mmwave_ros2_pkg::mmWaveDataHdl',
@@ -64,4 +76,9 @@ def generate_launch_description():
     return launch.LaunchDescription([
         container,
         mmwave_quick_config,
+        mmwave_comm_srv_node,
+        TimerAction(    
+            period=3.0,
+            actions=[rviz2]
+        ),
     ])

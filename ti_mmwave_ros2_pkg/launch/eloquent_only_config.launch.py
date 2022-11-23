@@ -20,7 +20,7 @@ def generate_launch_description():
     mmwave_quick_config = Node(
         package='ti_mmwave_ros2_pkg',
         node_executable='mmWaveQuickConfig',
-        # node_name='mmwave_quick_config',
+        node_name='mmwave_quick_config',
         output='screen',
         arguments=[cfg_file_path],
         parameters=[{

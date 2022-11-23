@@ -178,7 +178,7 @@ void *DataUARTHandler::readIncomingData(void) {
 
   while (rclcpp::ok()) {
 
-    std::cout << "readIncomingData" << std::endl;
+    // std::cout << "readIncomingData" << std::endl;
 
     /*Start reading UART data and writing to buffer while also checking for
      * magicWord*/
@@ -260,7 +260,7 @@ int DataUARTHandler::isMagicWord(uint8_t last8Bytes[8]) {
 void *DataUARTHandler::syncedBufferSwap(void) {
   while (rclcpp::ok()) {
 
-    std::cout << "syncedBufferSwap" << std::endl;
+    // std::cout << "syncedBufferSwap" << std::endl;
 
     pthread_mutex_lock(&countSync_mutex);
 
@@ -316,7 +316,7 @@ void *DataUARTHandler::sortIncomingData(void) {
 
   while (rclcpp::ok()) {
 
-    std::cout << "sortIncomingData" << std::endl;
+    // std::cout << "sortIncomingData" << std::endl;
 
     switch (sorterState) {
 

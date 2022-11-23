@@ -87,9 +87,34 @@ component_container: ../nptl/pthread_mutex_lock.c:81: __pthread_mutex_lock: Asse
 ```
 
 ```
+sudo chmod 666 /dev/ttyUSB0
+sudo chmod 666 /dev/ttyUSB1
+
 ros2 run ti_mmwave_ros2_pkg ti_mmwave_ros2_pkg
+=> 이거 하면 
+DataUARTHandler Read Thread: Port is opensyncedBufferSwap
+이거까지는 나온다.
+
+ros2 run ti_mmwave_ros2_pkg mmwave_comm_srv_node
 ros2 launch ti_mmwave_ros2_pkg eloquent_only_config.launch.py
+
 ```
+
+* launch 파일 만들기
+```
+ros2 launch ti_mmwave_ros2_pkg eloquent_composition.launch.py
+```
+* parameter 바꿀 수 있게 변경
+```
+
+```
+
+* rviz
+```
+ros2 launch ti_mmwave_ros2_pkg eloquent_composition.launch.py
+use sim time true로 하면 점이 안사라진다.
+```
+
 
 ```
 ros2 launch ti_mmwave_ros2_pkg eloquent_composition.launch.py

@@ -95,6 +95,7 @@ ament_target_dependencies(${PROJECT_NAME}
   serial
 )
 
+# mmWaveQuickConfig
 add_executable(mmWaveQuickConfig src/mmWaveQuickConfig.cpp)
 target_link_libraries(mmWaveQuickConfig mmwave)
 ament_target_dependencies(mmWaveQuickConfig
@@ -108,15 +109,29 @@ ament_target_dependencies(mmWaveQuickConfig
   serial
 )
 
+# mmWaveCommSrvNode 
+add_executable(mmwave_comm_srv_node src/mmWaveCommSrvNode.cpp)
+ament_target_dependencies(mmwave_comm_srv_node 
+  rclcpp
+  rclcpp_components
+  sensor_msgs
+  visualization_msgs
+  std_msgs
+  pcl_conversions
+  ti_mmwave_ros2_interfaces
+  serial
+)
+
 install(TARGETS
   mmwave
   ARCHIVE DESTINATION lib
-  LIBRARY DESTINATION lib
+  LIBRARY DESTINATION libPROJECT_NAME
   RUNTIME DESTINATION bin)
 
 # Install launch files.
 install(DIRECTORY
   launch
+  rviz
   cfg
   DESTINATION share/${PROJECT_NAME}
 )
@@ -124,7 +139,8 @@ install(DIRECTORY
 install(
   TARGETS
     ${PROJECT_NAME}
-  mmWaveQuickConfig
+    mmWaveQuickConfig
+    mmwave_comm_srv_node
   DESTINATION
     lib/${PROJECT_NAME}
 )
