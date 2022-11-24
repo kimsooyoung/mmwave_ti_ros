@@ -66,21 +66,35 @@ private:
 
 public:
   mmWaveCommSrv() : rclcpp::Node("mmWaveCommSrvNode") {
-    // ros::NodeHandle private_nh = getPrivateNodeHandle();
-    // ros::NodeHandle private_nh2("~"); // follow namespace for multiple
-    // sensors
-
     mySerialPort = this->declare_parameter("command_port", "/dev/ttyUSB0");
-
     myBaudRate = this->declare_parameter("command_rate", 115200);
     mmWaveCLIName = this->declare_parameter("mmWaveCLI_name", "mmWaveCLI");
+
+    // 모든 parameter는 우선 여기서 다 설정한다.
+    // 필요한 node는 get_parameter srv call로 얻어간다.
+    this->declare_parameter("numAdcSamples", 240);
+    this->declare_parameter("numLoops", 16);
+
+    this->declare_parameter("num_TX", 3);
+
+    this->declare_parameter("f_s", 7.5e+06);
+    this->declare_parameter("f_c", 6.23e+10);
+
+    this->declare_parameter("BW", 3.2e+09);
+    this->declare_parameter("PRI", 8.1e-05);
+    this->declare_parameter("t_fr", 0.033333);
+
+    this->declare_parameter("max_range", 11.2422);
+    this->declare_parameter("range_resolution", 0.0468426);
+    this->declare_parameter("max_doppler_vel", 9.90139);
+    this->declare_parameter("doppler_vel_resolution", 0.618837);
 
     RCLCPP_INFO(this->get_logger(), "mmWaveCommSrv: command_port = %s",
                 mySerialPort.c_str());
     RCLCPP_INFO(this->get_logger(), "mmWaveCommSrv: command_rate = %d",
                 myBaudRate);
 
-    // service client
+    // service server
     commSrv = create_service<ti_mmwave_ros2_interfaces::srv::MMWaveCLI>(
         mmWaveCLIName, std::bind(&mmWaveCommSrv::commSrv_cb, this,
                                  std::placeholders::_1, std::placeholders::_2));

@@ -26,6 +26,7 @@ public:
 
 private:
 };
+
 // Code below is just to start the node
 int main(int argc, char **argv) {
   rclcpp::init(argc, argv);

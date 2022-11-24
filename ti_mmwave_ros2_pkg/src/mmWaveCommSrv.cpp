@@ -46,13 +46,28 @@ mmWaveCommSrv::mmWaveCommSrv(const rclcpp::NodeOptions &options)
 }
 
 void mmWaveCommSrv::onInit() {
-  // ros::NodeHandle private_nh = getPrivateNodeHandle();
-  // ros::NodeHandle private_nh2("~"); // follow namespace for multiple sensors
-
   mySerialPort = this->declare_parameter("command_port", "/dev/ttyUSB0");
-
   myBaudRate = this->declare_parameter("command_rate", 115200);
   mmWaveCLIName = this->declare_parameter("mmWaveCLI_name", "mmWaveCLI");
+
+  // 모든 parameter는 우선 여기서 다 설정한다.
+  // 필요한 node는 get_parameter srv call로 얻어간다.
+  this->declare_parameter("/ti_mmwave/numAdcSamples", 240);
+  this->declare_parameter("/ti_mmwave/numLoops", 16);
+
+  this->declare_parameter("/ti_mmwave/num_TX", 3);
+
+  this->declare_parameter("/ti_mmwave/f_s", 7.5e+06);
+  this->declare_parameter("/ti_mmwave/f_c", 6.23e+10);
+
+  this->declare_parameter("/ti_mmwave/BW", 3.2e+09);
+  this->declare_parameter("/ti_mmwave/PRI", 8.1e-05);
+  this->declare_parameter("/ti_mmwave/t_fr", 0.033333);
+
+  this->declare_parameter("/ti_mmwave/max_range", 11.2422);
+  this->declare_parameter("/ti_mmwave/range_resolution", 0.0468426);
+  this->declare_parameter("/ti_mmwave/max_doppler_vel", 9.90139);
+  this->declare_parameter("/ti_mmwave/doppler_vel_resolution", 0.618837);
 
   RCLCPP_INFO(this->get_logger(), "mmWaveCommSrv: command_port = %s",
               mySerialPort.c_str());
@@ -64,9 +79,6 @@ void mmWaveCommSrv::onInit() {
       mmWaveCLIName, std::bind(&mmWaveCommSrv::commSrv_cb, this,
                                std::placeholders::_1, std::placeholders::_2));
 
-  //   commSrv = private_nh.advertiseService(mmWaveCLIName,
-  //                                         &mmWaveCommSrv::commSrv_cb, this);
-
   RCLCPP_INFO(this->get_logger(), "mmWaveCommsrv: Finished onInit function");
 }
 
@@ -75,8 +87,8 @@ void mmWaveCommSrv::commSrv_cb(
     std::shared_ptr<ti_mmwave_ros2_interfaces::srv::MMWaveCLI::Response> res) {
 
   RCLCPP_DEBUG(this->get_logger(),
-              "mmWaveCommSrv: Port is \"%s\" and baud rate is %d",
-              mySerialPort.c_str(), myBaudRate);
+               "mmWaveCommSrv: Port is \"%s\" and baud rate is %d",
+               mySerialPort.c_str(), myBaudRate);
 
   /*Open Serial port and error check*/
   serial::Serial mySerialObject("", myBaudRate,
@@ -96,12 +108,14 @@ void mmWaveCommSrv::commSrv_cb(
       mySerialObject.open();
     } catch (std::exception &e2) {
       RCLCPP_ERROR(this->get_logger(),
-                   "mmWaveCommSrv: Failed second time to open User serial port, error: %s",
+                   "mmWaveCommSrv: Failed second time to open User serial "
+                   "port, error: %s",
                    e1.what());
       RCLCPP_INFO(this->get_logger(),
-                  "mmWaveCommSrv: Port could not be opened. Port is \"%s\" and baud rate is %d",
+                  "mmWaveCommSrv: Port could not be opened. Port is \"%s\" and "
+                  "baud rate is %d",
                   mySerialPort.c_str(), myBaudRate);
-    //   return false;
+      //   return false;
     }
   }
 

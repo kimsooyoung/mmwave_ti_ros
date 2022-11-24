@@ -47,6 +47,11 @@
 
 #include "ti_mmwave_ros2_pkg/ParameterParser.h"
 
+// 1. config 파일을 읽고 파싱한다.
+// 2. 한줄씩 service server에게 request한다.
+// 3. server는 serial read & write를 하는데 사실 둘은 같은 값이다.
+// 4. write된 값을 request로 받는다.
+// 5. request값을 parameter parser가 받아서 매개변수를 설정한다.
 int main(int argc, char **argv) {
   setvbuf(stdout, NULL, _IONBF, BUFSIZ);
 
@@ -54,8 +59,6 @@ int main(int argc, char **argv) {
 
   rclcpp::executors::SingleThreadedExecutor exec;
   rclcpp::NodeOptions options;
-
-  // std::cout << "argc : " << argc << std::endl;
 
   if (argc < 3) {
     std::cout << "mmWaveQuickConfig: usage: mmWaveQuickConfig "
@@ -71,6 +74,8 @@ int main(int argc, char **argv) {
 
   std::string mmWaveCLIName;
   mmWaveCLIName = node->declare_parameter("mmWaveCLI_name", "/mmWaveCLI");
+  
+  // service client
   auto client = node->create_client<ti_mmwave_ros2_interfaces::srv::MMWaveCLI>(
       mmWaveCLIName);
 
@@ -86,31 +91,12 @@ int main(int argc, char **argv) {
   auto request =
       std::make_shared<ti_mmwave_ros2_interfaces::srv::MMWaveCLI::Request>();
 
-  // ti_mmwave_rospkg::mmWaveCLI srv;
-
-  // if (argc != 2) {
-  //     ROS_INFO("mmWaveQuickConfig: usage: mmWaveQuickConfig
-  //     /file_directory/params.cfg"); return 1;
-  // } else
-  //     ROS_INFO("mmWaveQuickConfig: Configuring mmWave device using config
-  //     file: %s", argv[1]);
-
-  // std::string mmWaveCLIName;
-  // private_nh.getParam("mmWaveCLI_name", mmWaveCLIName);
-
-  // ros::ServiceClient client =
-  // nh.serviceClient<ti_mmwave_rospkg::mmWaveCLI>(mmWaveCLIName);
-
   std::ifstream myParams;
 
   auto parser = std::make_shared<ti_mmwave_ros2_pkg::ParameterParser>(options);
   exec.add_node(parser);
 
-  // //wait for service to become available
-  // ros::service::waitForService(mmWaveCLIName, 10000);
-
-  // wait 0.5 secs to avoid multi-sensor conflicts
-  // ros::Duration(0.5).sleep();
+  //wait for service to become available
   rclcpp::sleep_for(std::chrono::milliseconds(500));
 
   myParams.open(argv[1]);
@@ -135,6 +121,7 @@ int main(int argc, char **argv) {
         if (rclcpp::spin_until_future_complete(node, result_future) !=
             rclcpp::executor::FutureReturnCode::SUCCESS) {
           RCLCPP_ERROR(node->get_logger(), "service call failed :(");
+          // remove_pending_request => not in eloquent
           // client->remove_pending_request(result_future);
           return 1;
         }
@@ -144,6 +131,7 @@ int main(int argc, char **argv) {
           if (std::regex_search(result->resp, std::regex("Done"))) {
             // ROS_INFO("mmWaveQuickConfig: Command successful (mmWave sensor
             // responded with 'Done')");
+            std::cout << "result->resp : " << result->resp << std::endl;
             parser->ParamsParser(result->resp);
           } else {
             RCLCPP_ERROR(node->get_logger(),
@@ -162,7 +150,7 @@ int main(int argc, char **argv) {
       }
     }
     parser->CalParams();
-    parser->printParam();
+    exec.spin();
     myParams.close();
   } else {
     RCLCPP_ERROR(node->get_logger(),

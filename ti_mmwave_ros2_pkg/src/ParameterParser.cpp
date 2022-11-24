@@ -41,7 +41,20 @@
 namespace ti_mmwave_ros2_pkg {
 
 ParameterParser::ParameterParser(const rclcpp::NodeOptions &options)
-    : Node("parameter_parser", options) {}
+    : Node("parameter_parser", options) {
+  parameters_client = std::make_shared<rclcpp::AsyncParametersClient>(
+      this, "/mmWaveCommSrvNode");
+  parameters_client->wait_for_service();
+
+  while (!parameters_client->wait_for_service(std::chrono::seconds(1))) {
+    if (!rclcpp::ok()) {
+      RCLCPP_ERROR(this->get_logger(),
+                   "client interrupted while waiting for service to appear.");
+      exit(0);
+    }
+    RCLCPP_INFO(this->get_logger(), "waiting for service to appear...");
+  }
+}
 
 void ParameterParser::ParamsParser(const std::string &srv) {
 
@@ -128,46 +141,40 @@ void ParameterParser::CalParams() {
   float max_vel = c0 / (2 * fc * PRI) / ntx;
   float vvel = max_vel / nd;
 
-  if (!this->has_parameter("/ti_mmwave/doppler_vel_resolution")) {
-    this->declare_parameter("/ti_mmwave/num_TX");
-    this->declare_parameter("/ti_mmwave/f_s");
-    this->declare_parameter("/ti_mmwave/f_c");
-    this->declare_parameter("/ti_mmwave/BW");
-    this->declare_parameter("/ti_mmwave/PRI");
-    this->declare_parameter("/ti_mmwave/t_fr");
-    this->declare_parameter("/ti_mmwave/max_range");
-    this->declare_parameter("/ti_mmwave/range_resolution");
-    this->declare_parameter("/ti_mmwave/max_doppler_vel");
-    this->declare_parameter("/ti_mmwave/doppler_vel_resolution");
-  }
+  rclcpp::Parameter ntx_param("num_TX", ntx);
+  rclcpp::Parameter fs_param("f_s", fs);
+  rclcpp::Parameter fc_param("f_c", fc);
+  rclcpp::Parameter BW_param("BW", BW);
+  rclcpp::Parameter PRI_param("PRI", PRI);
+  rclcpp::Parameter tfr_param("t_fr", tfr);
+  rclcpp::Parameter max_range_param("max_range", max_range);
+  rclcpp::Parameter vrange_param("range_resolution", vrange);
+  rclcpp::Parameter max_vel_param("max_doppler_vel", max_vel);
+  rclcpp::Parameter vvel_param("doppler_vel_resolution", vvel);
 
-  this->set_parameter(rclcpp::Parameter("/ti_mmwave/num_TX", ntx));
-  this->set_parameter(rclcpp::Parameter("/ti_mmwave/f_s", fs));
-  this->set_parameter(rclcpp::Parameter("/ti_mmwave/f_c", fc));
-  this->set_parameter(rclcpp::Parameter("/ti_mmwave/BW", BW));
-  this->set_parameter(rclcpp::Parameter("/ti_mmwave/PRI", PRI));
-  this->set_parameter(rclcpp::Parameter("/ti_mmwave/t_fr", tfr));
-  this->set_parameter(rclcpp::Parameter("/ti_mmwave/max_range", max_range));
-  this->set_parameter(rclcpp::Parameter("/ti_mmwave/range_resolution", vrange));
-  this->set_parameter(rclcpp::Parameter("/ti_mmwave/max_doppler_vel", max_vel));
-  this->set_parameter(
-      rclcpp::Parameter("/ti_mmwave/doppler_vel_resolution", vvel));
+  auto parameters_future = parameters_client->set_parameters(
+      {ntx_param, fs_param, fc_param, BW_param, PRI_param, tfr_param,
+       max_range_param, vrange_param, max_vel_param, vvel_param},
+      std::bind(&ParameterParser::callbackGlobalParam, this,
+                std::placeholders::_1));
 
-  std::cout << "/ti_mmwave/num_TX : " << ntx << std::endl;
-  std::cout << "/ti_mmwave/f_s : " << fs << std::endl;
-  std::cout << "/ti_mmwave/f_c : " << fc << std::endl;
-  std::cout << "/ti_mmwave/BW : " << BW << std::endl;
-  std::cout << "/ti_mmwave/PRI : " << PRI << std::endl;
-  std::cout << "/ti_mmwave/t_fr : " << tfr << std::endl;
-  std::cout << "/ti_mmwave/max_range : " << max_range << std::endl;
-  std::cout << "/ti_mmwave/range_resolution : " << vrange << std::endl;
-  std::cout << "/ti_mmwave/max_doppler_vel : " << max_vel << std::endl;
-  std::cout << "/ti_mmwave/doppler_vel_resolution : " << vvel << std::endl;
-
+  std::cout << "num_TX : " << ntx << std::endl;
+  std::cout << "f_s : " << fs << std::endl;
+  std::cout << "f_c : " << fc << std::endl;
+  std::cout << "BW : " << BW << std::endl;
+  std::cout << "PRI : " << PRI << std::endl;
+  std::cout << "t_fr : " << tfr << std::endl;
+  std::cout << "max_range : " << max_range << std::endl;
+  std::cout << "range_resolution : " << vrange << std::endl;
+  std::cout << "max_doppler_vel : " << max_vel << std::endl;
+  std::cout << "doppler_vel_resolution : " << vvel << std::endl;
 }
 
-void ParameterParser::printParam() {
-
+void ParameterParser::callbackGlobalParam(
+    std::shared_future<std::vector<rcl_interfaces::msg::SetParametersResult>>
+        future) {
+  RCLCPP_INFO(this->get_logger(), "Param Setup Done");
+  rclcpp::shutdown();
 }
 
 } // namespace ti_mmwave_ros2_pkg

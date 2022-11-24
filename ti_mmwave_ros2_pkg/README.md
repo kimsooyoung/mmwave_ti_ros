@@ -98,6 +98,7 @@ DataUARTHandler Read Thread: Port is opensyncedBufferSwap
 ros2 run ti_mmwave_ros2_pkg mmwave_comm_srv_node
 ros2 launch ti_mmwave_ros2_pkg eloquent_only_config.launch.py
 
+ros2 param list
 ```
 
 * launch 파일 만들기
@@ -105,8 +106,14 @@ ros2 launch ti_mmwave_ros2_pkg eloquent_only_config.launch.py
 ros2 launch ti_mmwave_ros2_pkg eloquent_composition.launch.py
 ```
 * parameter 바꿀 수 있게 변경
-```
 
+> config에서 미리 셋업을 하고 생성도 한 다음, 그걸 ti_mmwave_ros2_pkg가 받아서 사용하도록 한다.
+> 대신 한번 바꾸면 다시 또 바꿀 수는 없음
+```
+ros2 run ti_mmwave_ros2_pkg mmwave_comm_srv_node
+ros2 launch ti_mmwave_ros2_pkg eloquent_only_config.launch.py
+
+ros2 run ti_mmwave_ros2_pkg ti_mmwave_ros2_pkg
 ```
 
 * rviz

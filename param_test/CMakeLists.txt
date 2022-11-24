@@ -37,10 +37,18 @@ ament_target_dependencies(param_get_node rclcpp)
 add_executable(param_set_node src/param_set_node.cpp)
 ament_target_dependencies(param_set_node rclcpp)
 
+add_executable(global_param_get src/global_param_get.cpp)
+ament_target_dependencies(global_param_get rclcpp)
+
+add_executable(global_param_set src/global_param_set.cpp)
+ament_target_dependencies(global_param_set rclcpp)
+
 install(
   TARGETS
     param_get_node
     param_set_node
+    global_param_set
+    global_param_get
   DESTINATION
     lib/${PROJECT_NAME}
 )

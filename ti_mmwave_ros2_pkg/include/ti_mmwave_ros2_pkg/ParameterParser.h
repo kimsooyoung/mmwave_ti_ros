@@ -5,7 +5,6 @@
 #include "std_msgs/msg/string.hpp"
 #include "ti_mmwave_ros2_interfaces/srv/mm_wave_cli.hpp"
 
-
 #include <cstdio>
 #include <cstdlib>
 #include <fstream>
@@ -13,7 +12,6 @@
 #include <sstream>
 #include <string>
 #include <vector>
-
 
 namespace ti_mmwave_ros2_pkg {
 
@@ -23,8 +21,12 @@ public:
   explicit ParameterParser(const rclcpp::NodeOptions &options);
 
   void ParamsParser(const std::string &srv);
+
   void CalParams();
-  void printParam();
+
+  void callbackGlobalParam(
+      std::shared_future<std::vector<rcl_interfaces::msg::SetParametersResult>>
+          future);
 
 private:
   float startFreq;
@@ -41,6 +43,9 @@ private:
   int numLoops;
   int numFrames;
   float framePeriodicity;
+
+  std::shared_ptr<rclcpp::AsyncParametersClient>
+      parameters_client;
 };
 
 } // namespace ti_mmwave_ros2_pkg
