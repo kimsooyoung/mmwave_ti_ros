@@ -43,7 +43,7 @@ public:
     /*User callable function to set maxAllowedElevationAngleDeg*/
     void setMaxAllowedAzimuthAngleDeg(int myMaxAllowedAzimuthAngleDeg);
 
-    void setNodeHandle(ros::NodeHandle* nh);
+    // void setNodeHandle(ros::NodeHandle* nh);
       
     /*User callable function to start the handler's internal threads*/
     void start(void);
@@ -130,7 +130,7 @@ private:
     /*Sort incoming UART Data Thread*/
     void *sortIncomingData(void);
     
-    void visualize(const ti_mmwave_rospkg::RadarScan &msg);
+    void visualize(const ti_mmwave_ros2_interfaces::msg::RadarScan &msg);
 
     ros::NodeHandle* nodeHandle;
     
