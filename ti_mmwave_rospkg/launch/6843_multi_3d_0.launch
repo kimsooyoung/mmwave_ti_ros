@@ -28,7 +28,7 @@
     <param name="mmWaveCLI_name" value="/mmWaveCLI" />
   </node>
 
-  <node pkg="tf" type="static_transform_publisher" name="radar_baselink_0" args="0 0 0 0 0 3.1415 ti_mmwave_pcl ti_mmwave_0 100"/>
+  <!-- <node pkg="tf" type="static_transform_publisher" name="radar_baselink_0" args="0 0 0 0 0 3.1415 ti_mmwave_pcl ti_mmwave_0 100"/> -->
 
-  <node pkg="rviz" type="rviz" name="rviz" args="-d $(find ti_mmwave_rospkg)/launch/rviz/ti_mmwave_sw.rviz"/>
+  <!-- <node pkg="rviz" type="rviz" name="rviz" args="-d $(find ti_mmwave_rospkg)/launch/rviz/ti_mmwave_sw.rviz"/> -->
 </launch>
