@@ -122,7 +122,26 @@ ros2 launch ti_mmwave_ros2_pkg eloquent_composition.launch.py
 use sim time true로 하면 점이 안사라진다.
 ```
 
+* 이 모든 것을 한번에!
 
 ```
 ros2 launch ti_mmwave_ros2_pkg eloquent_composition.launch.py
+```
+
+```
+==============================
+List of parameters
+==============================
+Number of range samples: 240
+Number of chirps: 16
+f_s: 7.500 MHz
+f_c: 62.300 GHz
+Bandwidth: 3200.000 MHz
+PRI: 81.000 us
+Frame time: 33.333 ms
+Max range: 11.242 m
+Range resolution: 0.047 m
+Max Doppler: +-4.951 m/s
+Doppler resolution: 0.619 m/s
+==============================
 ```

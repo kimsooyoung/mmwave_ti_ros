@@ -18,6 +18,8 @@ public:
     auto parameters_future = parameters_client->get_parameters(
         {"my_str", "my_int", "my_double"}, std::bind(&TestGetGlobalParam::callbackGlobalParam,
                                        this, std::placeholders::_1));
+
+    RCLCPP_INFO(this->get_logger(), "Got global param done");
   }
   void callbackGlobalParam(
       std::shared_future<std::vector<rclcpp::Parameter>> future) {
