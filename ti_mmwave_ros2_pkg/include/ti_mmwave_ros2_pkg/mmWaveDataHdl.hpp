@@ -66,13 +66,7 @@ class mmWaveDataHdl : public rclcpp::Node {
 public:
   explicit mmWaveDataHdl(const rclcpp::NodeOptions &options);
 
-  rcl_interfaces::msg::SetParametersResult
-  parametersCallback(const std::vector<rclcpp::Parameter> &parameters);
-  void timer_callback();
-
 private:
-  OnSetParametersCallbackHandle::SharedPtr callback_handle_;
-  rclcpp::TimerBase::SharedPtr timer_;
   std::shared_ptr<DataUARTHandler> DataHandler;
 
   int nr;

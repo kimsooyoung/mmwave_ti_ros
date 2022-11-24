@@ -4,7 +4,9 @@ import launch
 from launch import LaunchDescription
 from launch_ros.actions import Node
 
-from launch.actions import TimerAction
+from launch.actions import TimerAction, RegisterEventHandler
+
+from launch.event_handlers import OnProcessExit
 from launch_ros.descriptions import ComposableNode
 from launch_ros.actions import ComposableNodeContainer
 
@@ -33,7 +35,7 @@ def generate_launch_description():
     mmwave_comm_srv_node = Node(
         package='ti_mmwave_ros2_pkg',
         node_executable='mmwave_comm_srv_node',
-        node_name='mmwave_comm_srv_node',
+        node_name='mmWaveCommSrvNode',
         output='screen',
         parameters=[{
             "command_port": "/dev/ttyUSB0",
@@ -74,9 +76,14 @@ def generate_launch_description():
     )
 
     return launch.LaunchDescription([
-        container,
-        mmwave_quick_config,
         mmwave_comm_srv_node,
+        mmwave_quick_config,
+        RegisterEventHandler(
+            event_handler=OnProcessExit(
+                target_action=mmwave_quick_config,
+                on_exit=[container],
+            )
+        ),
         TimerAction(    
             period=3.0,
             actions=[rviz2]

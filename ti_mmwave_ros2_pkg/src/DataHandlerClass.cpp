@@ -51,6 +51,25 @@ DataUARTHandler::DataUARTHandler()
   //   marker_pub = create_publisher<visualization_msgs::msg::Marker>(
   //       "/ti_mmwave/radar_scan_markers", 100);
 
+  parameters_client = std::make_shared<rclcpp::AsyncParametersClient>(
+      this, "/mmWaveCommSrvNode");
+
+  while (!parameters_client->wait_for_service(std::chrono::seconds(1))) {
+    if (!rclcpp::ok()) {
+      RCLCPP_ERROR(this->get_logger(),
+                   "client interrupted while waiting for service to appear.");
+      return;
+    }
+    RCLCPP_INFO(this->get_logger(), "waiting for service to appear...");
+  }
+
+  auto parameters_future = parameters_client->get_parameters(
+      {"numAdcSamples", "numLoops", "num_TX", "f_s", "f_c", "BW", "PRI", "t_fr",
+       "max_range", "range_resolution", "max_doppler_vel",
+       "doppler_vel_resolution"},
+      std::bind(&DataUARTHandler::callbackGlobalParam, this,
+                std::placeholders::_1));
+
   maxAllowedElevationAngleDeg = 90; // Use max angle if none specified
   maxAllowedAzimuthAngleDeg = 90;   // Use max angle if none specified
 }
@@ -64,26 +83,23 @@ void DataUARTHandler::getPublishers(
   this->marker_pub = marker_pub_in;
 }
 
-void DataUARTHandler::setParameter(int nr_in, int nd_in, int ntx_in,
-                                   float fs_in, float fc_in, float BW_in,
-                                   float PRI_in, float tfr_in,
-                                   float max_range_in, float vrange_in,
-                                   float max_vel_in, float vvel_in) {
-  nr = nr_in;
-  nd = nd_in;
-  ntx = ntx_in;
+void DataUARTHandler::callbackGlobalParam(
+    std::shared_future<std::vector<rclcpp::Parameter>> future) {
 
-  fs = fs_in;
-  fc = fc_in;
+  auto result = future.get();
+  nr = result.at(0).as_int();
+  nd = result.at(1).as_int();
+  ntx = result.at(2).as_int();
 
-  BW = BW_in;
-  PRI = PRI_in;
-  tfr = tfr_in;
-
-  max_range = max_range_in;
-  vrange = vrange_in;
-  max_vel = max_vel_in;
-  vvel = vvel_in;
+  fs = static_cast<float>(result.at(3).as_double());
+  fc = static_cast<float>(result.at(4).as_double());
+  BW = static_cast<float>(result.at(5).as_double());
+  PRI = static_cast<float>(result.at(6).as_double());
+  tfr = static_cast<float>(result.at(7).as_double());
+  max_range = static_cast<float>(result.at(8).as_double());
+  vrange = static_cast<float>(result.at(9).as_double());
+  max_vel = static_cast<float>(result.at(10).as_double());
+  vvel = static_cast<float>(result.at(11).as_double());
 
   printf(
       "\n\n==============================\nList of "

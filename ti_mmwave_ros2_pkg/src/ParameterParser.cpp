@@ -44,7 +44,6 @@ ParameterParser::ParameterParser(const rclcpp::NodeOptions &options)
     : Node("parameter_parser", options) {
   parameters_client = std::make_shared<rclcpp::AsyncParametersClient>(
       this, "/mmWaveCommSrvNode");
-  parameters_client->wait_for_service();
 
   while (!parameters_client->wait_for_service(std::chrono::seconds(1))) {
     if (!rclcpp::ok()) {
@@ -141,6 +140,8 @@ void ParameterParser::CalParams() {
   float max_vel = c0 / (2 * fc * PRI) / ntx;
   float vvel = max_vel / nd;
 
+  rclcpp::Parameter nr_param("numAdcSamples", nr);
+  rclcpp::Parameter nd_param("numLoops", nd);
   rclcpp::Parameter ntx_param("num_TX", ntx);
   rclcpp::Parameter fs_param("f_s", fs);
   rclcpp::Parameter fc_param("f_c", fc);
@@ -153,11 +154,13 @@ void ParameterParser::CalParams() {
   rclcpp::Parameter vvel_param("doppler_vel_resolution", vvel);
 
   auto parameters_future = parameters_client->set_parameters(
-      {ntx_param, fs_param, fc_param, BW_param, PRI_param, tfr_param,
-       max_range_param, vrange_param, max_vel_param, vvel_param},
+      {nr_param, nd_param, ntx_param, fs_param, fc_param, BW_param, PRI_param,
+       tfr_param, max_range_param, vrange_param, max_vel_param, vvel_param},
       std::bind(&ParameterParser::callbackGlobalParam, this,
                 std::placeholders::_1));
 
+  std::cout << "numAdcSamples : " << nr << std::endl;
+  std::cout << "numLoops : " << nd << std::endl;
   std::cout << "num_TX : " << ntx << std::endl;
   std::cout << "f_s : " << fs << std::endl;
   std::cout << "f_c : " << fc << std::endl;

@@ -39,16 +39,11 @@ public:
   COMPOSITION_PUBLIC
   DataUARTHandler();
 
-  //
   COMPOSITION_PUBLIC
   void getPublishers(
       const rclcpp::Publisher<PointCloud2>::SharedPtr DataUARTHandler_pub_in,
       const rclcpp::Publisher<RadarScan>::SharedPtr radar_scan_pub_in,
       const rclcpp::Publisher<Marker>::SharedPtr marker_pub_in);
-
-  void setParameter(int nr_in, int nd_in, int ntx_in, float fs_in, float fc_in,
-                    float BW_in, float PRI_in, float tfr_in, float max_range_in,
-                    float vrange_in, float max_vel_in, float vvel_in);
 
   void setFrameID(char *myFrameID);
 
@@ -64,8 +59,6 @@ public:
   /*User callable function to set maxAllowedElevationAngleDeg*/
   void setMaxAllowedAzimuthAngleDeg(int myMaxAllowedAzimuthAngleDeg);
 
-  // void setNodeHandle(ros::NodeHandle *nh);
-
   /*User callable function to start the handler's internal threads*/
   void start(void);
 
@@ -75,6 +68,9 @@ public:
   static void *sortIncomingData_helper(void *context);
 
   static void *syncedBufferSwap_helper(void *context);
+
+  void callbackGlobalParam(
+      std::shared_future<std::vector<rclcpp::Parameter>> future);
 
   /*Sorted mmwDemo Data structure*/
   mmwDataPacket mmwData;
@@ -152,15 +148,11 @@ private:
 
   void visualize(const RadarScan &msg);
 
-  // ros::NodeHandle *nodeHandle;
-
   rclcpp::Publisher<PointCloud2>::SharedPtr DataUARTHandler_pub;
   rclcpp::Publisher<RadarScan>::SharedPtr radar_scan_pub;
   rclcpp::Publisher<Marker>::SharedPtr marker_pub;
 
-  // ros::Publisher DataUARTHandler_pub;
-  // ros::Publisher radar_scan_pub;
-  // ros::Publisher marker_pub;
+  std::shared_ptr<rclcpp::AsyncParametersClient> parameters_client;
 };
 
 #endif
