@@ -40,10 +40,14 @@ public:
   DataUARTHandler();
 
   COMPOSITION_PUBLIC
-  void getPublishers(
+  void setPublishers(
       const rclcpp::Publisher<PointCloud2>::SharedPtr DataUARTHandler_pub_in,
       const rclcpp::Publisher<RadarScan>::SharedPtr radar_scan_pub_in,
       const rclcpp::Publisher<Marker>::SharedPtr marker_pub_in);
+
+  void onInit();
+
+  void setNamespace(const std::string &ns);
 
   void setFrameID(char *myFrameID);
 
@@ -151,7 +155,8 @@ private:
   rclcpp::Publisher<PointCloud2>::SharedPtr DataUARTHandler_pub;
   rclcpp::Publisher<RadarScan>::SharedPtr radar_scan_pub;
   rclcpp::Publisher<Marker>::SharedPtr marker_pub;
-
+  
+  std::string ns;
   std::shared_ptr<rclcpp::AsyncParametersClient> parameters_client;
 };
 

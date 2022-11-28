@@ -42,7 +42,8 @@
 #include <stdio.h>
 
 DataUARTHandler::DataUARTHandler()
-    : rclcpp::Node("DataUARTHandler"), currentBufp(&pingPongBuffers[0]), nextBufp(&pingPongBuffers[1]) {
+    : rclcpp::Node("DataUARTHandler"), currentBufp(&pingPongBuffers[0]),
+      nextBufp(&pingPongBuffers[1]) {
   //   DataUARTHandler_pub = create_publisher<sensor_msgs::msg::PointCloud2>(
   //       "/ti_mmwave/radar_scan_pcl", 100);
   //   radar_scan_pub =
@@ -50,9 +51,13 @@ DataUARTHandler::DataUARTHandler()
   //       "/ti_mmwave/radar_scan", 100);
   //   marker_pub = create_publisher<visualization_msgs::msg::Marker>(
   //       "/ti_mmwave/radar_scan_markers", 100);
+  // onInit();
+}
+
+void DataUARTHandler::onInit() {
 
   parameters_client = std::make_shared<rclcpp::AsyncParametersClient>(
-      this, "/mmWaveCommSrvNode");
+      this, ns + "/mmWaveCommSrvNode");
 
   while (!parameters_client->wait_for_service(std::chrono::seconds(1))) {
     if (!rclcpp::ok()) {
@@ -74,7 +79,7 @@ DataUARTHandler::DataUARTHandler()
   maxAllowedAzimuthAngleDeg = 90;   // Use max angle if none specified
 }
 
-void DataUARTHandler::getPublishers(
+void DataUARTHandler::setPublishers(
     const rclcpp::Publisher<PointCloud2>::SharedPtr DataUARTHandler_pub_in,
     const rclcpp::Publisher<RadarScan>::SharedPtr radar_scan_pub_in,
     const rclcpp::Publisher<Marker>::SharedPtr marker_pub_in) {
@@ -82,6 +87,8 @@ void DataUARTHandler::getPublishers(
   this->radar_scan_pub = radar_scan_pub_in;
   this->marker_pub = marker_pub_in;
 }
+
+void DataUARTHandler::setNamespace(const std::string &ns) { this->ns = ns; }
 
 void DataUARTHandler::callbackGlobalParam(
     std::shared_future<std::vector<rclcpp::Parameter>> future) {
@@ -904,9 +911,8 @@ void DataUARTHandler::start(void) {
   }
 
   // rclcpp::spin(shared_from_this());
-  while(1)
+  while (1)
     continue;
-  
 
   pthread_join(iret1, NULL);
   printf("DataUARTHandler Read Thread joined\n");
