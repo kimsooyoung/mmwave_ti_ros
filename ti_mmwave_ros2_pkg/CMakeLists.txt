@@ -125,7 +125,7 @@ ament_target_dependencies(mmwave_comm_srv_node
 install(TARGETS
   mmwave
   ARCHIVE DESTINATION lib
-  LIBRARY DESTINATION libPROJECT_NAME
+  LIBRARY DESTINATION lib
   RUNTIME DESTINATION bin)
 
 # Install launch files.

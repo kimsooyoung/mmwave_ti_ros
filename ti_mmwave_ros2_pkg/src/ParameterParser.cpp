@@ -42,8 +42,16 @@ namespace ti_mmwave_ros2_pkg {
 
 ParameterParser::ParameterParser(const rclcpp::NodeOptions &options)
     : Node("parameter_parser", options) {
+}
+
+void ParameterParser::init(const std::string &ns){
+  std::string client_name = "";
+  if(ns.compare("") != 0)
+    client_name = "/" + ns + "/mmWaveCommSrvNode";
+
+  std::cout << "ParameterParser - client_name : " << client_name << std::endl;
   parameters_client = std::make_shared<rclcpp::AsyncParametersClient>(
-      this, "/mmWaveCommSrvNode");
+      this, client_name);
 
   while (!parameters_client->wait_for_service(std::chrono::seconds(1))) {
     if (!rclcpp::ok()) {
@@ -51,7 +59,7 @@ ParameterParser::ParameterParser(const rclcpp::NodeOptions &options)
                    "client interrupted while waiting for service to appear.");
       exit(0);
     }
-    RCLCPP_INFO(this->get_logger(), "waiting for service to appear...");
+    RCLCPP_INFO(this->get_logger(), "wwaiting for service to appear...");
   }
 }
 

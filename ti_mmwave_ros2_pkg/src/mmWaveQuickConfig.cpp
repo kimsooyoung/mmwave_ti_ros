@@ -72,8 +72,11 @@ int main(int argc, char **argv) {
 
   auto node = rclcpp::Node::make_shared("mmWaveQuickConfig");
 
-  std::string mmWaveCLIName;
-  mmWaveCLIName = node->declare_parameter("mmWaveCLI_name", "/mmWaveCLI");
+  std::string mmWaveCLIName, ns;
+  mmWaveCLIName = node->declare_parameter("mmWaveCLI_name", "mmWaveCLI");
+  ns = node->declare_parameter("namespace", "");
+  
+  std::cout << "mmWaveCLIName : " << mmWaveCLIName << std::endl;
   
   // service client
   auto client = node->create_client<ti_mmwave_ros2_interfaces::srv::MMWaveCLI>(
@@ -94,6 +97,7 @@ int main(int argc, char **argv) {
   std::ifstream myParams;
 
   auto parser = std::make_shared<ti_mmwave_ros2_pkg::ParameterParser>(options);
+  parser->init(ns);
   exec.add_node(parser);
 
   //wait for service to become available

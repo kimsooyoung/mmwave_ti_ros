@@ -20,6 +20,8 @@ class ParameterParser : public rclcpp::Node {
 public:
   explicit ParameterParser(const rclcpp::NodeOptions &options);
 
+  void init(const std::string &ns);
+
   void ParamsParser(const std::string &srv);
 
   void CalParams();

@@ -128,6 +128,25 @@ use sim time true로 하면 점이 안사라진다.
 ros2 launch ti_mmwave_ros2_pkg eloquent_composition.launch.py
 ```
 
+[Multi Sensor] Debug
+```
+/home/kimsooyoung/ros2_ws/install/ti_mmwave_ros2_pkg/lib/ti_mmwave_ros2_pkg/mmWaveQuickConfig /home/kimsooyoung/ros2_ws/install/ti_mmwave_ros2_pkg/share/ti_mmwave_ros2_pkg/cfg/6843ISK_3d.cfg --ros-args -r __node:=mmWaveQuickConfig -r __ns:=/radar_0
+
+ros2 run ti_mmwave_ros2_pkg mmwave_comm_srv_node --ros-args -r __ns:=/radar_0 -p "namespace:=radar_0"
+
+ros2 run rclcpp_components component_container
+
+ros2 component load /ComponentManager ti_mmwave_ros2_pkg ti_mmwave_ros2_pkg::mmWaveDataHdl -p namespace:="radar_0"
+```
+
+* multi sensor
+
+```
+ros2 launch ti_mmwave_ros2_pkg eloquent_multi0_composition.launch.py
+ros2 launch ti_mmwave_ros2_pkg eloquent_multi1_composition.launch.py
+ros2 launch ti_mmwave_ros2_pkg eloquent_multi_only_rviz.py
+```
+
 ```
 ==============================
 List of parameters

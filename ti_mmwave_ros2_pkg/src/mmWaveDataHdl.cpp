@@ -50,9 +50,12 @@ mmWaveDataHdl::mmWaveDataHdl(const rclcpp::NodeOptions &options)
 void mmWaveDataHdl::onInit() {
   std::string mySerialPort;
   std::string myFrameID;
+  std::string ns;
   int myBaudRate;
   int myMaxAllowedElevationAngleDeg;
   int myMaxAllowedAzimuthAngleDeg;
+
+  ns = this->declare_parameter("namespace", "");
 
   mySerialPort = this->declare_parameter("data_port", "/dev/ttyUSB1");
   myBaudRate = this->declare_parameter("data_rate", 921600);
@@ -71,13 +74,16 @@ void mmWaveDataHdl::onInit() {
   RCLCPP_INFO(this->get_logger(),
               "mmWaveDataHdl: max_allowed_azimuth_angle_deg = %d",
               myMaxAllowedAzimuthAngleDeg);
+  
+  if(ns.compare("") != 0)
+    ns = "/" + ns;
 
   auto DataUARTHandler_pub =
-      create_publisher<PointCloud2>("/ti_mmwave/radar_scan_pcl", 100);
+      create_publisher<PointCloud2>(ns +"/ti_mmwave/radar_scan_pcl", 100);
   auto radar_scan_pub =
-      create_publisher<RadarScan>("/ti_mmwave/radar_scan", 100);
+      create_publisher<RadarScan>(ns + "/ti_mmwave/radar_scan", 100);
   auto marker_pub =
-      create_publisher<Marker>("/ti_mmwave/radar_scan_markers", 100);
+      create_publisher<Marker>(ns + "/ti_mmwave/radar_scan_markers", 100);
 
   // 여기서 교착이 발생한다.
   //   DataUARTHandler DataHandler = DataUARTHandler();
@@ -97,7 +103,9 @@ void mmWaveDataHdl::onInit() {
   //   DataHandler.start();
 
   DataHandler = std::make_shared<DataUARTHandler>();
-  DataHandler->getPublishers(DataUARTHandler_pub, radar_scan_pub, marker_pub);
+  DataHandler->setNamespace(ns);
+  DataHandler->onInit();
+  DataHandler->setPublishers(DataUARTHandler_pub, radar_scan_pub, marker_pub);
 
   DataHandler->setFrameID((char *)myFrameID.c_str());
   DataHandler->setUARTPort((char *)mySerialPort.c_str());
