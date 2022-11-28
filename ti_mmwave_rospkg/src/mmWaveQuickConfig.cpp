@@ -74,6 +74,8 @@ int main(int argc, char **argv) {
         // Ignore comment lines (first non-space char is '%') or blank lines
         if (!(std::regex_match(srv.request.comm, std::regex("^\\s*%.*")) || std::regex_match(srv.request.comm, std::regex("^\\s*")))) {
             // ROS_INFO("mmWaveQuickConfig: Sending command: '%s'", srv.request.comm.c_str() );
+            std::cout << "srv.request.comm.c_str() : " << srv.request.comm.c_str() << std::endl;
+            
             if (client.call(srv)) {
             if (std::regex_search(srv.response.resp, std::regex("Done"))) {
                 // ROS_INFO("mmWaveQuickConfig: Command successful (mmWave sensor responded with 'Done')");            
