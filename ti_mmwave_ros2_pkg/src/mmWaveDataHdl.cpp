@@ -113,7 +113,7 @@ void mmWaveDataHdl::onInit() {
   DataHandler->setMaxAllowedElevationAngleDeg(myMaxAllowedElevationAngleDeg);
   DataHandler->setMaxAllowedAzimuthAngleDeg(myMaxAllowedAzimuthAngleDeg);
 
-  rclcpp::sleep_for(std::chrono::milliseconds(100));
+  rclcpp::sleep_for(std::chrono::milliseconds(200));
   // rclcpp::spin(DataHandler);
   rclcpp::spin_some(DataHandler);
   DataHandler->start();

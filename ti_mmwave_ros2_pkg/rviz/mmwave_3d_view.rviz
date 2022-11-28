@@ -46,8 +46,8 @@ Visualization Manager:
     - Alpha: 1
       Autocompute Intensity Bounds: true
       Autocompute Value Bounds:
-        Max Value: 0.40406084060668945
-        Min Value: -0.032776471227407455
+        Max Value: 1.187076210975647
+        Min Value: -0.3031825125217438
         Value: true
       Axis: Z
       Channel Name: intensity
@@ -75,6 +75,26 @@ Visualization Manager:
         Value: /ti_mmwave/radar_scan_pcl
       Use Fixed Frame: true
       Use rainbow: true
+      Value: true
+    - Class: rviz_default_plugins/TF
+      Enabled: true
+      Frame Timeout: 15
+      Frames:
+        All Enabled: true
+        ti_mmwave_0:
+          Value: true
+        ti_mmwave_pcl:
+          Value: true
+      Marker Scale: 1
+      Name: TF
+      Show Arrows: true
+      Show Axes: true
+      Show Names: false
+      Tree:
+        ti_mmwave_pcl:
+          ti_mmwave_0:
+            {}
+      Update Interval: 0
       Value: true
   Enabled: true
   Global Options:
@@ -119,7 +139,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz_default_plugins/Orbit
-      Distance: 5.6920952796936035
+      Distance: 5.529343128204346
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
