@@ -97,6 +97,8 @@ PointCloudToLaserScanNode::PointCloudToLaserScanNode(const rclcpp::NodeOptions &
 
   subscription_listener_thread_ = std::thread(
     std::bind(&PointCloudToLaserScanNode::subscriptionListenerThreadLoop, this));
+  
+  RCLCPP_INFO(this->get_logger(),"PointCloud To LaserScan Node Start");
 }
 
 PointCloudToLaserScanNode::~PointCloudToLaserScanNode()
@@ -119,7 +121,7 @@ void PointCloudToLaserScanNode::subscriptionListenerThreadLoop()
           "Got a subscriber to laserscan, starting pointcloud subscriber");
         rclcpp::SensorDataQoS qos;
         qos.keep_last(input_queue_size_);
-        sub_.subscribe(this, "cloud_in", qos.get_rmw_qos_profile());
+        sub_.subscribe(this, "cloud", qos.get_rmw_qos_profile());
       }
     } else if (sub_.getSubscriber()) {
       RCLCPP_INFO(this->get_logger(),
@@ -139,7 +141,8 @@ void PointCloudToLaserScanNode::cloudCallback(
   
   // build laserscan output
   auto scan_msg = std::make_unique<sensor_msgs::msg::LaserScan>();
-  scan_msg->header = cloud_msg->header;
+  // scan_msg->header = cloud_msg->header;
+  scan_msg->header.stamp = this->get_clock()->now();
   if (!target_frame_.empty()) {
     scan_msg->header.frame_id = target_frame_;
   }
