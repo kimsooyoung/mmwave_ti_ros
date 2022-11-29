@@ -59,7 +59,7 @@ void mmWaveDataHdl::onInit() {
 
   mySerialPort = this->declare_parameter("data_port", "/dev/ttyUSB1");
   myBaudRate = this->declare_parameter("data_rate", 921600);
-  myFrameID = this->declare_parameter("frame_id", "/ti_mmwave_0");
+  myFrameID = this->declare_parameter("frame_id", "ti_mmwave_0");
   myMaxAllowedElevationAngleDeg =
       this->declare_parameter("max_allowed_elevation_angle_deg", 90);
   myMaxAllowedAzimuthAngleDeg =
