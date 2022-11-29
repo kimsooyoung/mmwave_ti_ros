@@ -19,9 +19,10 @@ def generate_launch_description():
     cfg_file = "6843ISK_3d.cfg"
     namespace = ""
 
-    pkg_dir_path = get_package_share_directory('ti_mmwave_ros2_pkg')
-    cfg_file_path = os.path.join(pkg_dir_path, 'cfg', cfg_file)
-    rviz_config_file = os.path.join(pkg_dir_path, 'rviz', 'mmwave_3d_view.rviz')
+    mmwave_pkg_dir_path = get_package_share_directory('ti_mmwave_ros2_pkg')
+    this_pkg_dir_path = get_package_share_directory('ti_mmwave_ros2_examples')
+    cfg_file_path = os.path.join(mmwave_pkg_dir_path, 'cfg', cfg_file)
+    rviz_config_file = os.path.join(this_pkg_dir_path, 'rviz', 'laser_scan.rviz')
 
     mmwave_quick_config = Node(
         package='ti_mmwave_ros2_pkg',
@@ -51,23 +52,31 @@ def generate_launch_description():
         node_executable='pointcloud_to_laserscan_node',
         node_name='pointcloud_to_laserscan',
         remappings=[
-            ('cloud_in', ['/cloud']),
+            # ('cloud_in', ['/cloud']),
+            ('cloud', ['/ti_mmwave/radar_scan_pcl']),
             # ('scan', ['/ssss']),
         ],
         parameters=[{
-            'target_frame': 'test',
+            'target_frame': 'scan_frame',
             'transform_tolerance': 0.01,
-            'min_height': 0.0,
+            'min_height': -1.0,
             'max_height': 1.0,
-            'angle_min': -1.5708,  # -M_PI/2
-            'angle_max': 1.5708,  # M_PI/2
+            'angle_min': -1.5707,  # -M_PI/2
+            'angle_max': 1.5707,  # M_PI/2
             'angle_increment': 0.0087,  # M_PI/360.0
             'scan_time': 0.3333,
-            'range_min': 0.45,
-            'range_max': 4.0,
-            'use_inf': True,
+            'range_min': 0.0,
+            'range_max': 2.0,
+            'use_inf': False,
             'inf_epsilon': 1.0
         }],
+    )
+
+    static_transform_publisher = Node(
+        package='tf2_ros',
+        node_executable='static_transform_publisher',
+        node_name='static_transform_publisher',
+        arguments=['0', '0', '0', '0', '0', '0', '1', 'ti_mmwave_0', 'scan_frame']
     )
 
     rviz2 = Node(
@@ -92,7 +101,7 @@ def generate_launch_description():
                     parameters=[{
                         "data_port": "/dev/ttyUSB1",
                         "data_rate": 921600,
-                        "frame_id": "/ti_mmwave_0",
+                        "frame_id": "ti_mmwave_0",
                         "max_allowed_elevation_angle_deg": 90,
                         "max_allowed_azimuth_angle_deg": 90,
                     }]
@@ -102,34 +111,18 @@ def generate_launch_description():
     )
 
     return launch.LaunchDescription([
-        # DeclareLaunchArgument(
-        #     name='scanner', default_value='scanner',
-        #     description='Namespace for sample topics'
-        # ),
-        # mmwave_comm_srv_node,
-        # mmwave_quick_config,
-        # RegisterEventHandler(
-        #     event_handler=OnProcessExit(
-        #         target_action=mmwave_quick_config,
-        #         on_exit=[container],
-        #     )
-        # ),
-
-        # Node(
-        #     package='pointcloud_to_laserscan', node_executable='dummy_pointcloud_publisher',
-        #     remappings=[('cloud', [ '/cloud'])],
-        #     parameters=[{'cloud_frame_id': 'cloud', 'cloud_extent': 2.0, 'cloud_size': 500}],
-        #     node_name='cloud_publisher'
-        # ),
-        # Node(
-        #     package='tf2_ros',
-        #     node_executable='static_transform_publisher',
-        #     node_name='static_transform_publisher',
-        #     arguments=['0', '0', '0', '0', '0', '0', '1', 'map', 'cloud']
-        # ),
+        mmwave_comm_srv_node,
+        mmwave_quick_config,
         pointcloud_to_laserscan_node,
-        # TimerAction(    
-        #     period=3.0,
-        #     actions=[rviz2]
-        # ),
+        static_transform_publisher,
+        RegisterEventHandler(
+            event_handler=OnProcessExit(
+                target_action=mmwave_quick_config,
+                on_exit=[container],
+            )
+        ),
+        TimerAction(    
+            period=3.0,
+            actions=[rviz2]
+        ),
     ])
