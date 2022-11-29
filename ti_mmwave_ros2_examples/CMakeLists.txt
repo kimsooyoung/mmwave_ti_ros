@@ -83,7 +83,9 @@ install(TARGETS
 # Install launch files.
 install(DIRECTORY
   launch
+  param
   rviz
+  map
   DESTINATION share/${PROJECT_NAME}
 )
 
