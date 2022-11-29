@@ -58,7 +58,7 @@ namespace pointcloud_to_laserscan
 PointCloudToLaserScanNode::PointCloudToLaserScanNode(const rclcpp::NodeOptions & options)
 : rclcpp::Node("pointcloud_to_laserscan", options)
 {
-  target_frame_ = this->declare_parameter("target_frame", "");
+  target_frame_ = this->declare_parameter("target_frame", "test");
   tolerance_ = this->declare_parameter("transform_tolerance", 0.01);
   // TODO(hidmic): adjust default input queue size based on actual concurrency levels
   // achievable by the associated executor

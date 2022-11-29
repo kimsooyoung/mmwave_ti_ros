@@ -67,7 +67,8 @@ int main(int argc, char * argv[])
     *it_y = distribution(gen);
     *it_z = distribution(gen);
   }
-  dummy_cloud.header.frame_id = node->declare_parameter("cloud_frame_id", "");
+  //dummy_cloud.header.frame_id = node->declare_parameter("cloud_frame_id", "");
+  dummy_cloud.header.frame_id = node->declare_parameter("cloud_frame_id", "test");
 
   rclcpp::executors::SingleThreadedExecutor executor;
   executor.add_node(node);
