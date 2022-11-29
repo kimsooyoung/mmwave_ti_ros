@@ -445,7 +445,7 @@ void *DataUARTHandler::sortIncomingData(void) {
       }
 
       // RScan->header.seq = 0;
-      // RScan->header.stamp = (uint64_t)(ros::Time::now());
+      // RScan->header.stamp = rclcpp::Clock().now();
       // RScan->header.stamp = (uint32_t) mmwData.header.timeCpuCycles;
       RScan->header.frame_id = frameID;
       RScan->height = 1;

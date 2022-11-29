@@ -1,8 +1,9 @@
 import os
 
 import launch
-from launch import LaunchDescription
 from launch_ros.actions import Node
+from launch.actions import DeclareLaunchArgument
+from launch.substitutions import LaunchConfiguration
 
 from launch.actions import TimerAction, RegisterEventHandler
 
@@ -16,10 +17,12 @@ from ament_index_python.packages import get_package_share_directory
 def generate_launch_description():
 
     cfg_file = "6843ISK_3d.cfg"
+    namespace = ""
 
-    pkg_dir_path = get_package_share_directory('ti_mmwave_ros2_pkg')
-    cfg_file_path = os.path.join(pkg_dir_path, 'cfg', cfg_file)
-    rviz_config_file = os.path.join(pkg_dir_path, 'rviz', 'mmwave_3d_view.rviz')
+    mmwave_pkg_dir_path = get_package_share_directory('ti_mmwave_ros2_pkg')
+    this_pkg_dir_path = get_package_share_directory('ti_mmwave_ros2_examples')
+    cfg_file_path = os.path.join(mmwave_pkg_dir_path, 'cfg', cfg_file)
+    rviz_config_file = os.path.join(this_pkg_dir_path, 'rviz', 'laser_scan.rviz')
 
     mmwave_quick_config = Node(
         package='ti_mmwave_ros2_pkg',
@@ -42,6 +45,38 @@ def generate_launch_description():
             "command_rate": 115200,
             "mmWaveCLI_name": "/mmWaveCLI",
         }],
+    )
+
+    pointcloud_to_laserscan_node = Node(
+        package='ti_mmwave_ros2_examples', 
+        node_executable='pointcloud_to_laserscan_node',
+        node_name='pointcloud_to_laserscan',
+        remappings=[
+            # ('cloud_in', ['/cloud']),
+            ('cloud', ['/ti_mmwave/radar_scan_pcl']),
+            ('scan', ['/radar_scan']),
+        ],
+        parameters=[{
+            'target_frame': 'scan_frame',
+            'transform_tolerance': 0.01,
+            'min_height': -1.0,
+            'max_height': 1.0,
+            'angle_min': -1.5707,  # -M_PI/2
+            'angle_max': 1.5707,  # M_PI/2
+            'angle_increment': 0.0087,  # M_PI/360.0
+            'scan_time': 0.3333,
+            'range_min': 0.0,
+            'range_max': 2.0,
+            'use_inf': False,
+            'inf_epsilon': 1.0
+        }],
+    )
+
+    static_transform_publisher = Node(
+        package='tf2_ros',
+        node_executable='static_transform_publisher',
+        node_name='static_transform_publisher',
+        arguments=['0', '0', '0', '0', '0', '0', '1', 'ti_mmwave_0', 'scan_frame']
     )
 
     rviz2 = Node(
@@ -78,6 +113,8 @@ def generate_launch_description():
     return launch.LaunchDescription([
         mmwave_comm_srv_node,
         mmwave_quick_config,
+        pointcloud_to_laserscan_node,
+        static_transform_publisher,
         RegisterEventHandler(
             event_handler=OnProcessExit(
                 target_action=mmwave_quick_config,

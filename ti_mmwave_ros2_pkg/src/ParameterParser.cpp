@@ -48,6 +48,8 @@ void ParameterParser::init(const std::string &ns){
   std::string client_name = "";
   if(ns.compare("") != 0)
     client_name = "/" + ns + "/mmWaveCommSrvNode";
+  else
+    client_name = "/mmWaveCommSrvNode";
 
   std::cout << "ParameterParser - client_name : " << client_name << std::endl;
   parameters_client = std::make_shared<rclcpp::AsyncParametersClient>(
