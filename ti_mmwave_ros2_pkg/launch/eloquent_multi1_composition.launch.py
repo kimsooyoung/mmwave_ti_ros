@@ -69,7 +69,7 @@ def generate_launch_description():
                     parameters=[{
                         "data_port": "/dev/ttyUSB3",
                         "data_rate": 921600,
-                        "frame_id": "/ti_mmwave_1",
+                        "frame_id": "ti_mmwave_1",
                         "max_allowed_elevation_angle_deg": 90,
                         "max_allowed_azimuth_angle_deg": 90,
                         "namespace": namespace,
