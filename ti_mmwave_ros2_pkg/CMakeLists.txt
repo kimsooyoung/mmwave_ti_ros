@@ -31,6 +31,8 @@ find_package(ti_mmwave_ros2_interfaces REQUIRED)
 
 find_package(serial REQUIRED)
 
+# boost version check
+# cat /usr/include/boost/version.hpp | grep "BOOST_LIB_VERSION"
 find_package(Boost 1.65.1 REQUIRED)
 
 find_package(Threads REQUIRED)

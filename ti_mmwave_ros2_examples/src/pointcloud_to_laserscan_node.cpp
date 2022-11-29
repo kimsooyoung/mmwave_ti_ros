@@ -58,7 +58,7 @@ namespace pointcloud_to_laserscan
 PointCloudToLaserScanNode::PointCloudToLaserScanNode(const rclcpp::NodeOptions & options)
 : rclcpp::Node("pointcloud_to_laserscan", options)
 {
-  target_frame_ = this->declare_parameter("target_frame", "test");
+  target_frame_ = this->declare_parameter("target_frame", "scan_frame");
   tolerance_ = this->declare_parameter("transform_tolerance", 0.01);
   // TODO(hidmic): adjust default input queue size based on actual concurrency levels
   // achievable by the associated executor
@@ -83,12 +83,16 @@ PointCloudToLaserScanNode::PointCloudToLaserScanNode(const rclcpp::NodeOptions &
     tf2_ = std::make_unique<tf2_ros::Buffer>(this->get_clock());
     auto timer_interface = std::make_shared<tf2_ros::CreateTimerROS>(
       this->get_node_base_interface(), this->get_node_timers_interface());
+    
     tf2_->setCreateTimerInterface(timer_interface);
+    
     tf2_listener_ = std::make_unique<tf2_ros::TransformListener>(*tf2_);
+    
     message_filter_ = std::make_unique<MessageFilter>(
       sub_, *tf2_, target_frame_, input_queue_size_,
       this->get_node_logging_interface(),
       this->get_node_clock_interface());
+    
     message_filter_->registerCallback(
       std::bind(&PointCloudToLaserScanNode::cloudCallback, this, _1));
   } else {  // otherwise setup direct subscription
