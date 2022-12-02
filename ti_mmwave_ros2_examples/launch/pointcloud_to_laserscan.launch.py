@@ -79,6 +79,13 @@ def generate_launch_description():
         arguments=['0', '0', '0', '0', '0', '0', '1', 'ti_mmwave_0', 'scan_frame']
     )
 
+    static_transform_publisher_base_link = Node(
+        package='tf2_ros',
+        node_executable='static_transform_publisher',
+        node_name='static_transform_publisher',
+        arguments=['0', '0', '0', '0', '0', '0', '1', 'base_link', 'ti_mmwave_0']
+    )
+
     rviz2 = Node(
         package='rviz2',
         node_executable='rviz2',
@@ -115,6 +122,7 @@ def generate_launch_description():
         mmwave_quick_config,
         pointcloud_to_laserscan_node,
         static_transform_publisher,
+        static_transform_publisher_base_link,
         RegisterEventHandler(
             event_handler=OnProcessExit(
                 target_action=mmwave_quick_config,

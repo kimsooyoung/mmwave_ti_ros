@@ -160,12 +160,23 @@ public:
     req->comm.append("\n");
     mySerialObject.write(req->comm.c_str());
 
+    /*
+    if(std::string(req->comm.c_str()).compare("sensorStart\n") == 0){
+        mySerialObject.readline(res->resp, 1024, ":/>");
+        RCLCPP_INFO(this->get_logger(),
+                "mmWaveCommSrv: Received response from sensor: '%s'",
+                res->resp.c_str());
+    }
+    */
+
+    rclcpp::sleep_for(std::chrono::milliseconds(10));
     /*Read output from mmwDemo*/
+    /**/
     mySerialObject.readline(res->resp, 1024, ":/>");
     RCLCPP_INFO(this->get_logger(),
                 "mmWaveCommSrv: Received response from sensor: '%s'",
                 res->resp.c_str());
-
+    /**/
     mySerialObject.close();
   }
 };

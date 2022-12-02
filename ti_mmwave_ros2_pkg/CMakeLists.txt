@@ -33,7 +33,9 @@ find_package(serial REQUIRED)
 
 # boost version check
 # cat /usr/include/boost/version.hpp | grep "BOOST_LIB_VERSION"
-find_package(Boost 1.65.1 REQUIRED)
+set( Boost_LIBRARY_DIR_RELEASE "/usr/lib/aarch64-linux-gnu" )
+#find_package(Boost REQUIRED COMPONENTS system)
+find_package(Boost 1.65.1 REQUIRED COMPONENTS system filesystem)
 
 find_package(Threads REQUIRED)
 
@@ -46,6 +48,8 @@ include_directories(include
   ${PCL_INCLUDE_DIRS}
   ${pthread_INCLUDE_DIRS}
   ${rt_INCLUDE_DIRS}
+  # ADDED
+  ${Boost_INCLUDE_DIRS}
 )
 
 link_directories(${Boost_LIBRARIES_DIRS})
@@ -76,6 +80,8 @@ ament_target_dependencies(mmwave
 )
 target_link_libraries(mmwave
   ${serial_LIBRARIES}
+  # added 
+  ${Boost_LIBRARIES}
 )
 rclcpp_components_register_nodes(mmwave "ti_mmwave_ros2_pkg::mmWaveDataHdl")
 set(node_plugins "${node_plugins}ti_mmwave_ros2_pkg::mmWaveDataHdl;$<TARGET_FILE:mmwave>\n")

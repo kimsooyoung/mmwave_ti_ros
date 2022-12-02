@@ -1,4 +1,4 @@
-image: hy_map.pgm
+image: hy_map_editted.pgm
 mode: trinary
 resolution: 0.05
 origin: [-3.4, -13.9, 0]

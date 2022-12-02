@@ -6,6 +6,7 @@ sudo chmod 666 /dev/ttyUSB1
 ros2 launch ti_mmwave_ros2_pkg eloquent_composition.launch.py
 # 통합됨
 ros2 launch ti_mmwave_ros2_examples pointcloud_to_laserscan.launch.py
+ros2 launch ti_mmwave_ros2_examples bringup_launch.py
 ```
 
 ```
