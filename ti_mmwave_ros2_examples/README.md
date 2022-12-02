@@ -7,6 +7,20 @@ ros2 launch ti_mmwave_ros2_pkg eloquent_composition.launch.py
 # 통합됨
 ros2 launch ti_mmwave_ros2_examples pointcloud_to_laserscan.launch.py
 ros2 launch ti_mmwave_ros2_examples bringup_launch.py
+
+# nav2 test 
+ros2 run tf2_ros static_transform_publisher 1 0 0 0.5 0 0 odom base_footprint
+ros2 run tf2_ros static_transform_publisher 0 0 0 0 0 0 base_footprint base_link
+
+odom => base_footprint => base_link 연결 필요
+amcl이 map => odom 연결, 하지만 이거 하려면 scan topic 필요
+
+ros2 launch ti_mmwave_ros2_examples bringup_launch.py
+
+ros2 launch ti_mmwave_ros2_examples localization_launch.py
+
+https://user-images.githubusercontent.com/12381733/205233048-23a71f52-2d87-46c0-bb2a-7dfdcabbaad3.png
+
 ```
 
 ```
