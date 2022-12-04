@@ -11,6 +11,12 @@ ros2 launch ti_mmwave_ros2_examples bringup_launch.py
 # nav2 test 
 ros2 run tf2_ros static_transform_publisher 1 0 0 0.5 0 0 odom base_footprint
 ros2 run tf2_ros static_transform_publisher 0 0 0 0 0 0 base_footprint base_link
+ros2 run tf2_ros static_transform_publisher 0 0 0 0 0 0 base_link  fake_laser_frame
+ros2 run ti_mmwave_ros2_examples fake_laser_scan
+
+docker exec -it ros2_humble bash
+ros2 launch ti_mmwave_ros2_examples bringup_launch.py open_rviz:=false
+
 
 odom => base_footprint => base_link 연결 필요
 amcl이 map => odom 연결, 하지만 이거 하려면 scan topic 필요
