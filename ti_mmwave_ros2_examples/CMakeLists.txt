@@ -57,6 +57,14 @@ ament_target_dependencies(dummy_pointcloud_publisher
   "sensor_msgs"
 )
 
+add_executable(fake_laser_scan
+  src/fake_laser_scan.cpp
+)
+ament_target_dependencies(fake_laser_scan
+  "rclcpp"
+  "sensor_msgs"
+)
+
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
   # the following line skips the linter which checks for copyrights
@@ -77,6 +85,7 @@ install(TARGETS
 
 install(TARGETS
   dummy_pointcloud_publisher
+  fake_laser_scan
   DESTINATION lib/${PROJECT_NAME}
 )
 
