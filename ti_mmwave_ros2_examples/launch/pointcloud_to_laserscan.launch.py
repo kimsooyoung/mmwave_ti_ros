@@ -118,19 +118,19 @@ def generate_launch_description():
     )
 
     return launch.LaunchDescription([
-        # mmwave_comm_srv_node,
-        # mmwave_quick_config,
+        mmwave_comm_srv_node,
+        mmwave_quick_config,
         pointcloud_to_laserscan_node,
         static_transform_publisher,
         static_transform_publisher_base_link,
-        # RegisterEventHandler(
-        #     event_handler=OnProcessExit(
-        #         target_action=mmwave_quick_config,
-        #         on_exit=[container],
-        #     )
-        # ),
-        # TimerAction(    
-        #     period=3.0,
-        #     actions=[rviz2]
-        # ),
+        RegisterEventHandler(
+            event_handler=OnProcessExit(
+                target_action=mmwave_quick_config,
+                on_exit=[container],
+            )
+        ),
+        #TimerAction(    
+        #    period=3.0,
+        #    actions=[rviz2]
+        #),
     ])

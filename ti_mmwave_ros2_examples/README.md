@@ -1,9 +1,7 @@
 
 ```
 # go1 launch
-ros2 run unitree_legged_real ros2_udp highlevel
-ros2 run unitree_legged_real ros_state_helper
-ros2 launch unitree_joy_cmd eloquent_joy_cmd.launch.py
+ros2 launch unitree_legged_real eloquent_high_level.launch.py
 ros2 run joy joy_node
 
 sudo chmod 666 /dev/ttyUSB0
