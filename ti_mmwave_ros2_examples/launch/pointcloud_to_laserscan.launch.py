@@ -83,7 +83,7 @@ def generate_launch_description():
         package='tf2_ros',
         node_executable='static_transform_publisher',
         node_name='static_transform_publisher',
-        arguments=['0', '0', '0', '0', '0', '0', '1', 'base_link', 'ti_mmwave_0']
+        arguments=['0.12', '0', '0', '0', '0', '3.1415', 'base_link', 'ti_mmwave_0']
     )
 
     rviz2 = Node(
@@ -118,19 +118,19 @@ def generate_launch_description():
     )
 
     return launch.LaunchDescription([
-        mmwave_comm_srv_node,
-        mmwave_quick_config,
+        # mmwave_comm_srv_node,
+        # mmwave_quick_config,
         pointcloud_to_laserscan_node,
         static_transform_publisher,
         static_transform_publisher_base_link,
-        RegisterEventHandler(
-            event_handler=OnProcessExit(
-                target_action=mmwave_quick_config,
-                on_exit=[container],
-            )
-        ),
-        TimerAction(    
-            period=3.0,
-            actions=[rviz2]
-        ),
+        # RegisterEventHandler(
+        #     event_handler=OnProcessExit(
+        #         target_action=mmwave_quick_config,
+        #         on_exit=[container],
+        #     )
+        # ),
+        # TimerAction(    
+        #     period=3.0,
+        #     actions=[rviz2]
+        # ),
     ])
