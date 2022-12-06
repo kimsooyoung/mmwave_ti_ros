@@ -6,7 +6,7 @@ amcl:
     alpha3: 0.05
     alpha4: 0.01
     alpha5: 0.04
-    base_frame_id: "base_link" #"base_footprint"
+    base_frame_id: "base_footprint" #"base_footprint"
     beam_skip_distance: 0.5
     beam_skip_error_threshold: 0.9
     beam_skip_threshold: 0.3
@@ -58,7 +58,7 @@ bt_navigator:
   ros__parameters:
     use_sim_time: False
     global_frame: map
-    robot_base_frame: base_link
+    robot_base_frame: base_footprint
     odom_topic: /odom
     bt_loop_duration: 10
     default_server_timeout: 20
@@ -203,7 +203,7 @@ local_costmap:
       update_frequency: 3.0
       publish_frequency: 3.0
       global_frame: odom
-      robot_base_frame: base_link
+      robot_base_frame: base_footprint
       use_sim_time: False
       rolling_window: true
       width: 3
@@ -250,7 +250,7 @@ global_costmap:
       update_frequency: 3.0
       publish_frequency: 1.0
       global_frame: map
-      robot_base_frame: base_link
+      robot_base_frame: base_footprint
       use_sim_time: False
       robot_radius: 0.175
       resolution: 0.01
@@ -338,7 +338,7 @@ behavior_server:
     wait:
       plugin: "nav2_behaviors/Wait"
     global_frame: odom
-    robot_base_frame: base_link
+    robot_base_frame: base_footprint
     transform_tolerance: 0.1
     use_sim_time: False
     simulate_ahead_time: 2.0
