@@ -10,6 +10,8 @@ sudo chmod 666 /dev/ttyUSB1
 ros2 launch ti_mmwave_ros2_pkg eloquent_composition.launch.py
 # 통합됨
 ros2 launch ti_mmwave_ros2_examples pointcloud_to_laserscan.launch.py
+ros2 launch rplidar_ros2 view_rplidar_a3_launch.py
+
 
 docker exec -it ros2_humble_arm64v8 bash
 ros2 launch ti_mmwave_ros2_examples bringup_launch.py open_rviz:=false

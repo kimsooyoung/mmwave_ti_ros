@@ -5,6 +5,8 @@ from launch_ros.actions import Node
 from launch.actions import DeclareLaunchArgument
 from launch.substitutions import LaunchConfiguration
 
+from launch.launch_description_sources import PythonLaunchDescriptionSource
+from launch.actions import IncludeLaunchDescription
 from launch.actions import TimerAction, RegisterEventHandler
 
 from launch.event_handlers import OnProcessExit
@@ -54,7 +56,7 @@ def generate_launch_description():
         remappings=[
             # ('cloud_in', ['/cloud']),
             ('cloud', ['/ti_mmwave/radar_scan_pcl']),
-            # ('scan', ['/radar_scan']),
+            ('scan', ['/radar_scan']),
         ],
         parameters=[{
             'target_frame': 'scan_frame',
@@ -84,6 +86,13 @@ def generate_launch_description():
         node_executable='static_transform_publisher',
         node_name='static_transform_publisher',
         arguments=['0.12', '0', '0', '0', '0', '3.1415', 'base_link', 'ti_mmwave_0']
+    )
+
+    static_transform_publisher_laser_link = Node(
+        package='tf2_ros',
+        node_executable='static_transform_publisher',
+        node_name='static_transform_publisher',
+        arguments=['0', '0', '0', '3.1415', '0', '0', 'base_link', 'laser']
     )
 
     rviz2 = Node(
@@ -117,18 +126,31 @@ def generate_launch_description():
             output='screen',
     )
 
+
+    # Rplidar Driver
+    rplidar_ros2_pkg = os.path.join(get_package_share_directory('rplidar_ros2'))
+    serial_port = "/dev/ttyUSB0"
+    rplidar_launch_file = "rplidar_a3_launch.py"
+    #rplidar_launch_file = "rplidar_launch.py"
+    rplidar_driver = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(os.path.join(rplidar_ros2_pkg, 'launch', rplidar_launch_file)),
+        launch_arguments={'serial_port': serial_port}.items()
+    )
+
     return launch.LaunchDescription([
-        mmwave_comm_srv_node,
-        mmwave_quick_config,
-        pointcloud_to_laserscan_node,
-        static_transform_publisher,
-        static_transform_publisher_base_link,
-        RegisterEventHandler(
-            event_handler=OnProcessExit(
-                target_action=mmwave_quick_config,
-                on_exit=[container],
-            )
-        ),
+        #mmwave_comm_srv_node,
+        #mmwave_quick_config,
+        #pointcloud_to_laserscan_node,
+        #static_transform_publisher,
+        #static_transform_publisher_base_link,
+        static_transform_publisher_laser_link,
+        rplidar_ros2_pkg,
+        #RegisterEventHandler(
+        #    event_handler=OnProcessExit(
+        #        target_action=mmwave_quick_config,
+        #        on_exit=[container],
+        #    )
+        #),
         #TimerAction(    
         #    period=3.0,
         #    actions=[rviz2]
