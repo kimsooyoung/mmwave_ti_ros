@@ -54,7 +54,7 @@ def generate_launch_description():
         remappings=[
             # ('cloud_in', ['/cloud']),
             ('cloud', ['/ti_mmwave/radar_scan_pcl']),
-            ('scan', ['/radar_scan']),
+            # ('scan', ['/radar_scan']),
         ],
         parameters=[{
             'target_frame': 'scan_frame',
