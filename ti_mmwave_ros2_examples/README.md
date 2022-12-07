@@ -18,6 +18,17 @@ ros2 launch ti_mmwave_ros2_examples bringup_launch.py open_rviz:=false
 ```
 
 ```
+ros2 run tf2_ros static_transform_publisher 0 0 0 0 0 0 base_link test
+ros2 run tf2_ros static_transform_publisher 0 0 0 0 0 0 base_footprint base_link
+ros2 run tf2_ros static_transform_publisher 0 0 0 0 0 0 odom base_footprint
+ros2 run ti_mmwave_ros2_examples dummy_pointcloud_publisher
+
+# 통합
+ros2 launch ti_mmwave_ros2_examples fake_nav_launch.py 
+ros2 launch ti_mmwave_ros2_examples bringup_launch.py open_rviz:=false
+```
+
+```
 ros2 run ti_mmwave_ros2_examples dummy_pointcloud_publisher
 ros2 run ti_mmwave_ros2_examples pointcloud_to_laserscan_node
 ros2 run tf2_ros static_transform_publisher 0 0 0 0 0 0 test scan_frame
