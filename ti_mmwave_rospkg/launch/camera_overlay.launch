@@ -40,6 +40,7 @@
   <node pkg="tf" type="static_transform_publisher" name="radar_baselink" args="0 0 0 0 0 3.1415 ti_mmwave_pcl ti_mmwave_0 100"/>
 
   <!-- <node pkg="tf" type="static_transform_publisher" name="camera_baselink" args="-2 0 .45 -1.5707963267948966 0 -1.5707963267948966 ti_mmwave_pcl usb_webcam 100"/> -->
+  <!-- <node pkg="tf" type="static_transform_publisher" name="camera_baselink" args="-0.3 0 .03 0 0 0 ti_mmwave_pcl usb_webcam 100"/> -->
   <node pkg="tf" type="static_transform_publisher" name="camera_baselink" args="-0.3 0 .03 -1.5707963267948966 0 -1.5707963267948966 ti_mmwave_pcl usb_webcam 100"/>
 
   <!-- Launch Rviz with pre-defined configuration to view mmWave sensor detected object data (color by intensity) -->
