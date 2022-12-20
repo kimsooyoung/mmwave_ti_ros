@@ -1,9 +1,0 @@
-<launch>
-
-  <!-- Call mmWave sensor launch file -->
-  <include file="$(find ti_mmwave_rospkg)/launch/bubble_sensor_north.launch"> </include>
-  <include file="$(find ti_mmwave_rospkg)/launch/bubble_sensor_east.launch"> </include>
-  <include file="$(find ti_mmwave_rospkg)/launch/bubble_sensor_south.launch"> </include>
-  <include file="$(find ti_mmwave_rospkg)/launch/bubble_sensor_west.launch"> </include>
- 
-</launch>
