@@ -1,50 +1,76 @@
-# TI mmWave ROS Package (Customized)
+# TI mmWave ROS 2 Package (Customized)
 
-```
+> Radar can overcome some cases that other sensors cannot. Such as transparent, metalic objects, dark and rainy area. TI's mmWave is cheap, stable, and powerful sensor for radar sensing. And this package is made for ROS 2 compatibility for that.
+
+- [ ] gif
+
+## Prepare Execution
+
+```bash
+# install linux pkgs
 sudo apt-get install libpthread-stubs0-dev
 sudo apt install ros-eloquent-perception-pcl -y
 sudo apt install ros-eloquent-composition -y
 
+# build ROS packages
+colcon build --symlink-install --packages-select serial
+source install/local_setup.bash
 
-cbp serial && roseloq
-cbp ti_mmwave_ros2_interfaces && roseloq
-cbp ti_mmwave_ros2_pkg && roseloq
-cbp ti_mmwave_ros2_examples && roseloq
+colcon build --symlink-install --packages-select ti_mmwave_ros2_interfaces
+source install/local_setup.bash
 
-# aarch64 case
-sudo apt-get update
-sudo apt-get install libpcl-dev
-sudo rm -i /etc/apt/sources.list.d/PPA_Name.list
-# pcl common is required but boost was not found
+colcon build --symlink-install --packages-select ti_mmwave_ros2_pkg
+source install/local_setup.bash
 
-
-# terminate called after throwing an instance of 'serial::SerialException'
-change USB Hub
+# For this package, pcl common is required, But don't be afraid, ROS Installing contains PCL
+colcon build --symlink-install --packages-select ti_mmwave_ros2_examples
+source install/local_setup.bash
 ```
 
-Boost error
+* If Boost error occurs during building, check your boost version with correct symbolic link
 
-```
-sudo apt remove libboost-dev -y
-sudo apt install libboost-dev -y
-rm build/ti_mmwave_ros2_pkg
+> ref by [stackoverflow](https://stackoverflow.com/questions/18200300/undefined-reference-to-boostsystemgeneric-category)
 
+```bash
 # check boost version
 cat /usr/include/boost/version.hpp | grep "BOOST_LIB_VERSION"
 # symbolic link reconfigure 
 sudo ln -s /usr/lib/aarch64-linux-gnu/libboost_system.so.1.65.1 /usr/lib/libboost_system.so
-https://stackoverflow.com/questions/18200300/undefined-reference-to-boostsystemgeneric-category
+```
+---
+
+## Run demo
+
+* Device Setup
+
+```bash
+# validate usb connection
+$ ls -l /dev/ | grep mmWave
+mmWave_00ED33DD_00 -> ttyUSB0
+mmWave_00ED33DD_01 -> ttyUSB1
+
+# give permission to usb pins
+sudo chmod 666 /dev/ttyUSB0
+sudo chmod 666 /dev/ttyUSB1
+```
+
+* Run ROS 2 Command
+
+```
+
 ```
 
 
+### Based on updates from Dr. Leo Zhang (University of Arizona)
 
-#### Based on updates from Dr. Leo Zhang (University of Arizona)
----
-### Most recent change from Dr. Zhang:
-Add support for XWR18XX devices. SDK version: 3.2.0.4.
+* Most recent change from Kim Soo Young:
+> Add support for ROS 2. SDK version: 3.5.0.4.
 
-### Most recent change from Allison Wendell:
-Add support for XWR68XX devices. SDK version: 3.2.0.4
+* Most recent change from Dr. Zhang:
+> Add support for XWR18XX devices. SDK version: 3.2.0.4.
+
+* Most recent change from Allison Wendell:
+> Add support for XWR68XX devices. SDK version: 3.2.0.4
   
 ---
 Initially derived from TI's origin ROS package in Industrial Toolbox 2.3.0 (new version available [Industrial Toolbox 2.5.2](http://dev.ti.com/tirex/#/?link=Software%2FmmWave%20Sensors%2FIndustrial%20Toolbox)).
@@ -63,7 +89,7 @@ TI mmWave xWR1642BOOST
 TI mmWave xWR1642BOOST ES2.0/3.0 EVM (not tested)
 TI mmWave xWR1642BOOST ES2.0 EVM
 TI mmWave AWR1843BOOST ES1.0 EVM
-TI mmWave IWR6843ISK ES1.0 EVM
+TI mmWave IWR6843ISK ES1.0 EVM (*verified)
 ```
 ---
 ### Quick start guide (AWR1642BOOST ES2.0 EVM):
@@ -151,6 +177,11 @@ mmwDemo:/>'
 ```
 When this happens, re-run the command you send to sensor. If it continues, shut down and restart the sensor.
 
+3.
+```
+terminate called after throwing an instance of 'serial::SerialException'
+```
+This means unstable serial connection, change use cable or hub.
 ---
 ### Multiple devices support (dual AWR1642 ES2.0 EVM):
 1. Connect two devices and try `ll /dev/serial/by-id` or `ls /dev`. In this case, `/dev/ttyACM0` to `/dev/ttyACM3` should shown.
