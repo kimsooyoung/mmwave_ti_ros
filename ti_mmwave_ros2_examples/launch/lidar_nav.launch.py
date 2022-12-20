@@ -56,7 +56,7 @@ def generate_launch_description():
         remappings=[
             # ('cloud_in', ['/cloud']),
             ('cloud', ['/ti_mmwave/radar_scan_pcl']),
-            # ('scan', ['/radar_scan']),
+            ('scan', ['/radar_scan']),
         ],
         parameters=[{
             'target_frame': 'scan_frame',
@@ -129,7 +129,7 @@ def generate_launch_description():
 
     # Rplidar Driver
     rplidar_ros2_pkg = os.path.join(get_package_share_directory('rplidar_ros2'))
-    serial_port = "/dev/ttyUSB0"
+    serial_port = "/dev/rplidar"
     rplidar_launch_file = "rplidar_a3_launch.py"
     #rplidar_launch_file = "rplidar_launch.py"
     rplidar_driver = IncludeLaunchDescription(
@@ -138,19 +138,19 @@ def generate_launch_description():
     )
 
     return launch.LaunchDescription([
-        mmwave_comm_srv_node,
-        mmwave_quick_config,
-        pointcloud_to_laserscan_node,
-        static_transform_publisher,
-        static_transform_publisher_base_link,
-        #static_transform_publisher_laser_link,
-        #rplidar_driver,
-        RegisterEventHandler(
-            event_handler=OnProcessExit(
-                target_action=mmwave_quick_config,
-                on_exit=[container],
-            )
-        ),
+        #mmwave_comm_srv_node,
+        #mmwave_quick_config,
+        #pointcloud_to_laserscan_node,
+        #static_transform_publisher,
+        #static_transform_publisher_base_link,
+        static_transform_publisher_laser_link,
+        rplidar_driver,
+        #RegisterEventHandler(
+        #    event_handler=OnProcessExit(
+        #        target_action=mmwave_quick_config,
+        #        on_exit=[container],
+        #    )
+        #),
         #TimerAction(    
         #    period=3.0,
         #    actions=[rviz2]

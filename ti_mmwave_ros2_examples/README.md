@@ -1,11 +1,26 @@
 
 ```
+# radar
+Bus 001 Device 006: ID 10c4:ea70 Cygnal Integrated Products, Inc. CP210x UART Bridge
+# lidar
+Bus 001 Device 007: ID 10c4:ea60 Cygnal Integrated Products, Inc. CP210x UART Bridge / myAVR mySmartUSB light
+
+
+# go1 launch
+ros2 launch unitree_legged_real eloquent_high_level.launch.py
+ros2 run joy joy_node
+
 sudo chmod 666 /dev/ttyUSB0
 sudo chmod 666 /dev/ttyUSB1
+export ROS_DOMAIN_ID=0
 
 ros2 launch ti_mmwave_ros2_pkg eloquent_composition.launch.py
 # 통합됨
 ros2 launch ti_mmwave_ros2_examples pointcloud_to_laserscan.launch.py
+ros2 launch ti_mmwave_ros2_examples lidar_nav.launch.py
+
+docker exec -it ros2_humble_arm64v8 bash
+ros2 launch ti_mmwave_ros2_examples bringup_launch.py open_rviz:=false
 ros2 launch ti_mmwave_ros2_examples bringup_launch.py
 
 # nav2 test 
@@ -20,8 +35,29 @@ ros2 launch ti_mmwave_ros2_examples bringup_launch.py
 ros2 launch ti_mmwave_ros2_examples localization_launch.py
 
 https://user-images.githubusercontent.com/12381733/205233048-23a71f52-2d87-46c0-bb2a-7dfdcabbaad3.png
+```
 
 ```
+
+# radar
+ros2 launch unitree_legged_real eloquent_high_level.launch.py
+ros2 launch ti_mmwave_ros2_examples pointcloud_to_laserscan.launch.py
+
+# lidar
+sudo chmod 777 /dev/
+ros2 launch unitree_legged_real eloquent_high_level.launch.py
+ros2 launch ti_mmwave_ros2_examples lidar_nav.launch.py
+
+
+ros2 run tf2_ros static_transform_publisher 0 0 0 0 0 0 base_link test
+ros2 run tf2_ros static_transform_publisher 0 0 0 0 0 0 base_footprint base_link
+ros2 run tf2_ros static_transform_publisher 0 0 0 0 0 0 odom base_footprint
+ros2 run ti_mmwave_ros2_examples dummy_pointcloud_publisher
+
+# 통합
+ros2 launch ti_mmwave_ros2_examples fake_nav_launch.py 
+ros2 launch ti_mmwave_ros2_examples bringup_launch.py open_rviz:=false
+
 
 ```
 ros2 run ti_mmwave_ros2_examples dummy_pointcloud_publisher
