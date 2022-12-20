@@ -15,12 +15,12 @@
 * Ubuntu 20.04 & ROS 2 foxy
 * NVIDIA Jetpack 4 & ROS 2 eloquent
 
-> Here's example of mount (designed by Jong Meung Lee)
+> Here's example of mount (designed by [Lee, Jongmyeong](http://rodel.hanyang.ac.kr/team/players.php?ptype=view&idx=72&page=1&code=play))
 
 <p align="center">
-    <img src="./img/radar_rviz_render.gif" height="200">
+    <img src="./img/mount_img.png" height="200">
+    <img src="./img/real_mount.jpeg" height="200">
 </p>
-
 
 2. Download SDK 3.0 or above from [here](http://www.ti.com/tool/MMWAVE-SDK) and use [UNIFLASH](http://www.ti.com/tool/UNIFLASH) to flash xwrXXXX_mmw_demo.bin to your device. **Do not forget SOP2 jumper when flashing.**
 
@@ -170,7 +170,9 @@ When this happens, re-run the command you send to sensor. If it continues, shut 
 ```
 terminate called after throwing an instance of 'serial::SerialException'
 ```
-This means unstable serial connection, change use cable or hub.
+
+This means unstable serial connection, change use cable or usb-hub.
+
 ---
 ### Multiple devices support (dual AWR1642 ES2.0 EVM):
 1. Connect two devices and try `ll /dev/serial/by-id` or `ls /dev`. In this case, `/dev/ttyACM0` to `/dev/ttyACM3` should shown.
@@ -188,15 +190,9 @@ roslaunch ti_mmwave_rospkg multi_1642_1.launch
 Note: As serial connection and the original code, you need to launch devices separately using different launch files.
 
 ---
-### Camera overlay support (working with USB camera or CV camera):
-1. Download and build USB camera repo [here](https://github.com/radar-lab/usb_webcam`). And set parameters of camera in `<usb_webcam dir>/launch/usb_webcam.launch`.
-2. To test the device image working, try:
-```
-roslaunch usb_webcam usb_webcam.launch
-rosrun rqt_image_view rqt_image_view  
-```
-3. Make sure you have done [ROS camera calibration](http://wiki.ros.org/camera_calibration) and create a `*.yaml` configuration file accordingly.
-4. Launch radar-camera system using:
-```
-roslaunch ti_mmwave_rospkg camera_overlay.launch
-```
+
+### TODO
+
+- [ ] Multi Sensor Documentation 
+- [ ] Navigation Usage Documentation
+- [ ] Camera overlay support
