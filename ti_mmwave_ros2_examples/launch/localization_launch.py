@@ -27,9 +27,9 @@ def generate_launch_description():
     # Get the launch directory
     my_nav_dir = get_package_share_directory('ti_mmwave_ros2_examples')
     my_param_dir = os.path.join(my_nav_dir, 'param')    
-    my_param_file = 'neuronbot_params.yaml'
+    my_param_file = 'go1_params.yaml'
     my_map_dir = os.path.join(my_nav_dir, 'map')
-    my_map_file = 'mememan.yaml'
+    my_map_file = 'hy_map_editted.yaml'
 
     namespace = LaunchConfiguration('namespace')
     map_yaml_file = LaunchConfiguration('map')
@@ -44,8 +44,11 @@ def generate_launch_description():
     # https://github.com/ros/robot_state_publisher/pull/30
     # TODO(orduno) Substitute with `PushNodeRemapping`
     #              https://github.com/ros2/launch_ros/issues/56
-    remappings = [('/tf', 'tf'),
-                  ('/tf_static', 'tf_static')]
+    remappings = [
+        ('/tf', 'tf'),
+        ('/tf_static', 'tf_static'),
+        ('scan', 'ssss')
+    ]
 
     # Create our own temporary YAML files that include substitutions
     param_substitutions = {
