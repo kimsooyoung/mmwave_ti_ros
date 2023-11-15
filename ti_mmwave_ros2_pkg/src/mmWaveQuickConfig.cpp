@@ -123,7 +123,7 @@ int main(int argc, char **argv) {
         // foxy : rclcpp::FutureReturnCode::SUCCESS
         // eloquent : rclcpp::executor::FutureReturnCode::SUCCESS
         if (rclcpp::spin_until_future_complete(node, result_future) !=
-            rclcpp::executor::FutureReturnCode::SUCCESS) {
+            rclcpp::FutureReturnCode::SUCCESS) {
           RCLCPP_ERROR(node->get_logger(), "service call failed :(");
           // remove_pending_request => not in eloquent
           // client->remove_pending_request(result_future);

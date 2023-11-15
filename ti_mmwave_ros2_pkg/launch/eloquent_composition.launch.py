@@ -15,7 +15,7 @@ from ament_index_python.packages import get_package_share_directory
 
 def generate_launch_description():
 
-    cfg_file = "6843ISK_3d.cfg"
+    cfg_file = "test_3d_1843_3.cfg"
 
     pkg_dir_path = get_package_share_directory('ti_mmwave_ros2_pkg')
     cfg_file_path = os.path.join(pkg_dir_path, 'cfg', cfg_file)
@@ -23,8 +23,8 @@ def generate_launch_description():
 
     mmwave_quick_config = Node(
         package='ti_mmwave_ros2_pkg',
-        node_executable='mmWaveQuickConfig',
-        node_name='mmwave_quick_config',
+        executable='mmWaveQuickConfig',
+        name='mmwave_quick_config',
         output='screen',
         arguments=[cfg_file_path],
         parameters=[{
@@ -34,11 +34,11 @@ def generate_launch_description():
 
     mmwave_comm_srv_node = Node(
         package='ti_mmwave_ros2_pkg',
-        node_executable='mmwave_comm_srv_node',
-        node_name='mmWaveCommSrvNode',
+        executable='mmwave_comm_srv_node',
+        name='mmWaveCommSrvNode',
         output='screen',
         parameters=[{
-            "command_port": "/dev/ttyUSB0",
+            "command_port": "/dev/ttyACM0",
             "command_rate": 115200,
             "mmWaveCLI_name": "/mmWaveCLI",
         }],
@@ -46,25 +46,25 @@ def generate_launch_description():
 
     rviz2 = Node(
         package='rviz2',
-        node_executable='rviz2',
-        node_name='rviz2',
+        executable='rviz2',
+        name='rviz2',
         arguments=['-d', rviz_config_file],
         parameters=[{'use_sim_time': False}],
     )
 
     """Generate launch description with multiple components."""
     container = ComposableNodeContainer(
-            node_name='my_container',
-            node_namespace='',
+            name='my_container',
+            namespace='',
             package='rclcpp_components',
-            node_executable='component_container',
+            executable='component_container',
             composable_node_descriptions=[
                 ComposableNode(
                     package='ti_mmwave_ros2_pkg',
-                    node_plugin='ti_mmwave_ros2_pkg::mmWaveDataHdl',
-                    node_name='mmWaveDataHdl',
+                    plugin='ti_mmwave_ros2_pkg::mmWaveDataHdl',
+                    name='mmWaveDataHdl',
                     parameters=[{
-                        "data_port": "/dev/ttyUSB1",
+                        "data_port": "/dev/ttyACM1",
                         "data_rate": 921600,
                         "frame_id": "ti_mmwave_0",
                         "max_allowed_elevation_angle_deg": 90,
